@@ -7,12 +7,8 @@
 
   <ItemGroup>
     <None Update="in\Input.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="out\" />
   </ItemGroup>
 
 </Project>
