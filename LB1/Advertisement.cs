@@ -59,9 +59,11 @@ namespace App
 
         public static void WriteFile(List<InputModel> inputModels)
         {
-            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"out\outFile.csv");
+            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.csv");
 
-            using (var stream = File.AppendText(file))
+            File.Delete(file);
+
+            using (var stream = File.CreateText(file))
             {
                 string csvRow;
 
@@ -105,48 +107,41 @@ namespace App
             };
 
             input.Add(addNewRow);
+            WriteFile(input);
             return input;
 
 
         }
-
-        public static void AddRowFile(int id, string url, DateTime startDate, DateTime endDate, decimal price, string title, string photoURl, string transactionNumber)
-        {
-            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\outFile.csv");
-
-            using (var stream = File.AppendText(file))
-            {
-                string csvRow;
-
-                csvRow = string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
-                    id,
-                    url,
-                    startDate,
-                    endDate,
-                    price,
-                    title,
-                    photoURl,
-                    transactionNumber
-                 );
-
-                stream.WriteLine(csvRow);
-            }
-        }
-
         public static List<InputModel> DeleteRow(List<InputModel> input, int id)
         {
             var delRow = input.FirstOrDefault(i => i.ID == id);
             input.Remove(delRow);
 
+            WriteFile(input);
             return input;
         }
 
-        public static List<InputModel> UpdateRow(List<InputModel> input,int id, string property, string value)
+        public static List<InputModel> UpdateRow(List<InputModel> input,string updateId, string property, string value)
         {
-            var newInput = input.Where(w => w.ID == id).ToList();
-            newInput.Price = 555;
+            int.TryParse(updateId, out int id);
+            foreach (var row in input.Where(w => w.ID == id))
+            {
+                if(property == "URL")
+                {
+                    row.URL = Validation.ValidateURL(value);
+                }
+                if(property == "Price")
+                {
+                    row.Price = Validation.ValidatePrice(value);
+                }
+                if(property == "StartDate")
+                {
+                    row.StartDate = Validation.ValidateDate(value);
+                }
 
-            return newInput;
+            }
+            WriteFile(input);
+            return input;
         }
 
         public static List<InputModel> Sort(List<InputModel> input, string property)
@@ -162,18 +157,40 @@ namespace App
             if (property == "ID")
             {
                 int.TryParse(value, out int id);
-                input.Where(w => w.ID == id);
+                return input.Where(w => w.ID == id).ToList();
             }
-            //var res = input.Where(w => w.GetType().GetProperty(property).Name == w.GetType().GetProperty(property).GetValue(value,null));
+            if (property == "URL")
+            {
+                return input.Where(w => w.URL.Contains(value)).ToList();
+            }
+            if (property == "StartDate")
+            {
+                var date = Validation.ValidateDate(value);
+                return input.Where(w => w.StartDate == date).ToList();
+            }
+            if (property == "EndDate")
+            {
+                var date1 = Validation.ValidateDate(value);
+                return input.Where(w => w.EndDate == date1).ToList();
+            }
+            if (property == "Price")
+            {
+                var price = Validation.ValidatePrice(value);
+                return input.Where(w => w.Price == price).ToList();
+            }
+            if (property == "Title")
+            {
+                return input.Where(w => w.Title.Contains(value)).ToList();
+            }
+            if (property == "PhotoURL")
+            {
+                return input.Where(w => w.PhotoURl.Contains(value)).ToList();
+            }
+            if (property == "TransactionNumber")
+            {
+                return input.Where(w => w.TransactionNumber == value).ToList();
+            }
 
-            //var valuefind = input.FindAll(x =>
-            //{
-            //    var dic = x as InputModel;
-
-
-            //    return dic.GetType().GetProperties().Any(key => dic.GetType().GetProperty(property).ToString().Contains(value));
-
-            //};
             return new List<InputModel>();
         }
 

@@ -16,7 +16,7 @@ namespace App
                              + "Edit press 4" + "\r\n"
                              + "Sort press 5" + "\r\n"
                              + "Exit press 6");
-
+                           
             Console.WriteLine();
             Console.WriteLine(@"in\Input.csv");
             
@@ -31,7 +31,7 @@ namespace App
 
             string key = string.Empty;
 
-            while (key != "exit")
+            while (key != "6")
             {
                 key = Console.ReadLine();
                 int menuId = 0;
@@ -49,6 +49,7 @@ namespace App
                                 Console.WriteLine("Enter value: ");
                                 var v = Console.ReadLine();
                                 result = Advertisement.Filter(list, pr, v);
+                                Advertisement.PrintFileModel(result);
                                 break;
                             case (int)MenuEnum.add:
                                 Console.WriteLine("Add");
@@ -96,6 +97,18 @@ namespace App
                                 }
                             case (int)MenuEnum.edit:
                                 Console.WriteLine("Edit");
+                                Console.WriteLine("Enter row which u wanna to update");
+                                string updateId = Console.ReadLine();
+                                Console.WriteLine(
+                                    "Choose property to edit: " + "\r\n"
+                                 + "URL" + "\r\n"
+                                 + "Price" + "\r\n"
+                                 + "StartDate" + "\r\n");
+                                string updatePropertyName = Console.ReadLine();
+                                Console.WriteLine("Enter new value");
+                                string newValue = Console.ReadLine();
+                                Advertisement.UpdateRow(list,updateId, updatePropertyName, newValue);
+                                Advertisement.PrintFileModel(list);
                                 break;
                             case (int)MenuEnum.sort:
                                 Console.WriteLine(
@@ -114,9 +127,7 @@ namespace App
                             default:
                                 Console.WriteLine("unknown comand");
                                 break;
-
-                        }
-                        
+                        }                     
                     }
                 }
             }
