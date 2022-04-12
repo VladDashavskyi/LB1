@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace LB2
+namespace Lab2
 {
     public static class Advertisement
     {

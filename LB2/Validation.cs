@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace LB2
+namespace Lab2
 {
     public static class Validation
     {

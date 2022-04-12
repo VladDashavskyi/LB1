@@ -1,4 +1,4 @@
-﻿namespace LB2
+﻿namespace Lab2
 {
     public enum MenuEnum
     {
