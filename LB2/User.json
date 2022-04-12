@@ -1,0 +1,27 @@
+﻿[
+  {
+    "FirstName": "Walter",
+    "LastName": "Skot",
+    "Email": "admin@gmail.com",
+    "Role": "Admin",
+    "Password": ""
+  },
+  {
+    "FirstName": "Staff1",
+    "LastName": "Staff1",
+    "Email": "staf1@gmail.com",
+    "Role": "Staff",
+    "Password": "",
+    "Salary": "250",
+    "FirstDateInCompany": "01.01.2021"
+  },
+  {
+    "FirstName": "Staff2",
+    "LastName": "Staff2",
+    "Email": "staf2@gmail.com",
+    "Role": "Staff",
+    "Password": "",
+    "Salary": "230",
+    "FirstDateInCompany": "05.01.2021"
+  }
+]

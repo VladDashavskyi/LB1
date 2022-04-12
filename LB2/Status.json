@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "1",
+    "Email": "staf1@gmail.com",
+    "Status": "Draft",
+    "Action": "Update"
+
+  },
+  {
+    "ID": "2",
+    "Email": "admin@gmail.com",
+    "Status": "Approved",
+    "Action": "Update"
+  },
+  {
+    "ID": "3",
+    "Email": "staf1@gmail.com",
+    "Status": "Draft",
+    "Action": "Delete"
+  },
+  {
+    "ID": "4",
+    "Email": "staf2@gmail.com",
+    "Status": "Draft",
+    "Action": "Add"
+  },
+  {
+    "ID": "5",
+    "Email": "staf1@gmail.com",
+    "Status": "Rejected",
+    "Action": "Add",
+    "Message": "Name - is less then 2 symbols"
+  }
+]
