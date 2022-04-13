@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using LB2.Model;
 using Newtonsoft.Json;
 
@@ -47,34 +48,45 @@ namespace Lab2
             WriteToJsonFile<T>(input, file);
             return input;
         }
-        public static List<T> DeleteRow<T>(T deleteRow, string file)
+        public static List<T> DeleteRow<T>(List<T> inputModels, string property, object id, string file)
         {
-            var input = ParceFileToModel<T>(file);
-            input.Remove(deleteRow);
-            WriteToJsonFile<T>(input, file);
-            return input;
+            var newInputModels = new List<T>();
+            foreach (var item in inputModels)
+            {
+                var propertyInfo = item.GetType().GetProperty(property);
+                var propertyValue = propertyInfo.GetValue(item, null);
+                if (propertyValue.ToString() == id.ToString())
+                {
+                    newInputModels.Remove(item);
+                }
+                else
+                {
+                    newInputModels.Add(item);
+                }
+            }
+            WriteToJsonFile<T>(newInputModels, file);
+            return newInputModels;
         }
 
-        public static List<InputModel> UpdateRow(List<InputModel> input, string updateId, string property, string value)
+        public static List<T> UpdateRow<T>(List<T> inputModels, T updateRow, string property, object id, string file)
         {
-            int.TryParse(updateId, out int id);
-            foreach (var row in input.Where(w => w.ID == id))
+            var newInputModels = new List<T>();
+            foreach (var item in inputModels)
             {
-                if (property == "URL")
+                var propertyInfo = item.GetType().GetProperty(property);
+                var propertyValue = propertyInfo.GetValue(item, null);
+                if (propertyValue == id)
                 {
-                    row.URL = Validation.ValidateURL(value);
+                    newInputModels.Remove(item);
+                    newInputModels.Add(updateRow);
                 }
-                if (property == "Price")
+                else
                 {
-                    row.Price = Validation.ValidatePrice(value);
+                    newInputModels.Add(item);
                 }
-                if (property == "StartDate")
-                {
-                    row.StartDate = Validation.ValidateDate(value);
-                }
-
             }
-            return input;
+            WriteToJsonFile<T>(newInputModels, file);
+            return newInputModels;
         }
 
         public static List<T> Sort<T>(List<T> input, string property, string file, int order = 0)
@@ -98,30 +110,49 @@ namespace Lab2
             return sortInput;
         }
 
-        public static List<T> Filter<T>(string file, Dictionary<string, string> filter)
+        public static List<T> Filter<T>(List<T> inputModels, string property, string value)
         {
-            
+            var filterInputModels = new List<T>();
+            foreach (var item in inputModels)
+            {
+                var propertyInfo = item.GetType().GetProperty(property);
+                if (propertyInfo == null)
+                {
+                    throw new Exception("property does not exists");
+                }
 
-            return new List<T>();
+                var propertyValue = propertyInfo.GetValue(item, null).ToString();
+                if (propertyValue == value)
+                {
+                    filterInputModels.Add(item);
+                }
+            }
+
+            return filterInputModels;
         }
 
-        public static void PrintFileModel(List<InputModel> inputModels)
+        public static void PrintFileModel<T>(List<T> inputModels)
         {
             if (inputModels == null)
             {
                 throw new Exception("Invalid input file");
             }
-            foreach (var row in inputModels)
+
+            var props = typeof(T).GetProperties();
+
+            foreach (var prop in props)
             {
-                Console.WriteLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
-                    row.ID,
-                    row.URL,
-                    row.StartDate,
-                    row.EndDate,
-                    row.Price,
-                    row.Title,
-                    row.PhotoURl,
-                    row.TransactionNumber));
+                Console.Write("{0}\t", prop.Name);
+            }
+            Console.WriteLine();
+
+            foreach (var item in inputModels)
+            {
+                foreach (var prop in props)
+                {
+                    Console.Write("{0}\t", prop.GetValue(item, null));
+                }
+                Console.WriteLine();
             }
         }
     }

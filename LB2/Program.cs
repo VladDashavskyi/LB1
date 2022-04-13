@@ -9,21 +9,20 @@ namespace Lab2
     {
         static void Main(string[] args)
         {
-           var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
-           var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Status.json");
-           var userFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"User.json") ?? String.Empty;
+            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
+            var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Status.json");
+            var userFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"User.json") ?? String.Empty;
 
-            
 
             try
             {
-                Console.WriteLine("Enter login");
-                var login = Console.ReadLine() ?? String.Empty;
-                Console.WriteLine("Enter password");
-                var password = Console.ReadLine() ?? String.Empty;
+                //Console.WriteLine("Enter login");
+                //var login = Console.ReadLine() ?? String.Empty;
+                //Console.WriteLine("Enter password");
+                //var password = Console.ReadLine() ?? String.Empty;
 
-                Register.CheckUser(userFile, login, password);
-                return;
+                //Register.CheckUser(userFile, login, password);
+                //return;
 
                 Console.WriteLine("MENU" + "\r\n"
                                  + "Search press 1" + "\r\n"
@@ -113,13 +112,17 @@ namespace Lab2
                                 var deleteRow = list.FirstOrDefault(i => i.ID == p);
                                 if (deleteRow != null)
                                 {
-                                    result = Advertisement.DeleteRow(deleteRow, file);
+                                    result = Advertisement.DeleteRow(list, "ID", p, file);
 
                                     if (count > result.Count)
                                     {
                                         Console.WriteLine("New list look:");
                                         Advertisement.PrintFileModel(result);
                                         break;
+                                    }
+                                    else
+                                    {
+                                        Advertisement.PrintFileModel(result);
                                     }
                                 }
                                 else
@@ -140,7 +143,26 @@ namespace Lab2
                                 string updatePropertyName = Console.ReadLine();
                                 Console.WriteLine("Enter new value");
                                 string newValue = Console.ReadLine();
-                                Advertisement.UpdateRow(list, updateId, updatePropertyName, newValue);
+
+                                int.TryParse(updateId, out int id);
+                                var updateRow = list.FirstOrDefault(x => x.ID == id);
+                                if (updateRow != null)
+                                {
+                                    if (updatePropertyName == "URL")
+                                    {
+                                        updateRow.URL = Validation.ValidateURL(newValue);
+                                    }
+                                    if (updatePropertyName == "Price")
+                                    {
+                                        updateRow.Price = Validation.ValidatePrice(newValue);
+                                    }
+                                    if (updatePropertyName == "StartDate")
+                                    {
+                                        updateRow.StartDate = Validation.ValidateDate(newValue);
+                                    }
+                                }
+
+                                Advertisement.UpdateRow(list, updateRow, "ID", id, file);
                                 Advertisement.PrintFileModel(list);
                                 break;
                             case (int)MenuEnum.sort:
