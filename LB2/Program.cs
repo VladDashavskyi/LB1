@@ -1,5 +1,7 @@
-﻿using System;
+﻿using LB2.Model;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab2
 {
@@ -7,9 +9,22 @@ namespace Lab2
     {
         static void Main(string[] args)
         {
+           var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
+           var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Status.json");
+           var userFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"User.json") ?? String.Empty;
+
+            
 
             try
             {
+                Console.WriteLine("Enter login");
+                var login = Console.ReadLine() ?? String.Empty;
+                Console.WriteLine("Enter password");
+                var password = Console.ReadLine() ?? String.Empty;
+
+                Register.CheckUser(userFile, login, password);
+                return;
+
                 Console.WriteLine("MENU" + "\r\n"
                                  + "Search press 1" + "\r\n"
                                  + "Add press 2" + "\r\n"
@@ -19,13 +34,9 @@ namespace Lab2
                                  + "Exit press 6");
 
                 Console.WriteLine();
-                Console.WriteLine(@"in\Input.csv");
+                Console.WriteLine(@"in\Input.json");
 
-
-                
-                //string[] inputFile = Advertisement.ReadFile();
-
-                var list = Advertisement.ParceFileToModel();
+                var list = Advertisement.ParceFileToModel<InputModel>(file);
 
                 Advertisement.PrintFileModel(list);
 
@@ -71,7 +82,20 @@ namespace Lab2
                                 var inputPhotoUrl = Console.ReadLine();
                                 Console.WriteLine("Enter Transaction number:");
                                 var inputTransactionNumber = Console.ReadLine();
-                                result = Advertisement.AddRow(list, inputId, inputUrl, inputStartDate, inputEndDate, inputPrice, inputTitle, inputPhotoUrl, inputTransactionNumber);
+
+                                var newRow = new InputModel
+                                {
+                                    ID = Validation.ValidateId(inputId),
+                                    URL = Validation.ValidateURL(inputUrl),
+                                    StartDate = Validation.ValidateDate(inputStartDate),
+                                    EndDate = Validation.ValidateDate(inputEndDate),
+                                    Price = Validation.ValidatePrice(inputPrice),
+                                    Title = Validation.ValidateTitle(inputTitle),
+                                    PhotoURl = Validation.ValidateURL(inputPhotoUrl),
+                                    TransactionNumber = Validation.ValidateTransactionNumber(inputTransactionNumber)
+                                };
+
+                                result = Advertisement.AddRow(newRow, file);
                                 Advertisement.PrintFileModel(result);
                                 break;
                             case (int)MenuEnum.delete:
@@ -85,18 +109,25 @@ namespace Lab2
                                     break;
                                 }
                                 int count = list.Count;
-                                result = Advertisement.DeleteRow(list, p);
-                                if (count > result.Count)
+
+                                var deleteRow = list.FirstOrDefault(i => i.ID == p);
+                                if (deleteRow != null)
                                 {
-                                    Console.WriteLine("New list look:");
-                                    Advertisement.PrintFileModel(result);
-                                    break;
+                                    result = Advertisement.DeleteRow(deleteRow, file);
+
+                                    if (count > result.Count)
+                                    {
+                                        Console.WriteLine("New list look:");
+                                        Advertisement.PrintFileModel(result);
+                                        break;
+                                    }
                                 }
                                 else
                                 {
                                     Console.WriteLine("Unknown ID");
-                                    break;
+
                                 }
+                                break;
                             case (int)MenuEnum.edit:
                                 Console.WriteLine("Edit");
                                 Console.WriteLine("Enter row which u wanna to update");
@@ -119,8 +150,12 @@ namespace Lab2
                                  + "Title" + "\r\n"
                                  + "Price" + "\r\n");
                                 string sorting = Console.ReadLine();
+                                Console.WriteLine(
+                                    "Choose order: 0 - desc, 1 - asc");
+                                string stringOrder = Console.ReadLine();
+                                int.TryParse(stringOrder, out int order);
                                 Console.WriteLine("Sort");
-                                list = Advertisement.Sort(list, sorting);
+                                list = Advertisement.Sort<InputModel>(list, sorting, file, order);
                                 Advertisement.PrintFileModel(list);
                                 break;
                             case (int)MenuEnum.exit:

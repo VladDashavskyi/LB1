@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lab2
+namespace LB2.Model
 {
     public class InputModel
     {

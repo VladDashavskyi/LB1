@@ -2,38 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LB2.Model;
 using Newtonsoft.Json;
 
 namespace Lab2
 {
     public static class Advertisement
     {
-
-        public static string[] ReadFile()
+        public static List<T> ParceFileToModel<T>(string file)
         {
             try
             {
-                var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.csv");
-                return File.ReadAllLines(file);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
+                List<T> outList = new List<T>();
 
-        public static List<InputModel> ParceFileToModel()
-        {
-            try
-            {
-                List<InputModel> outList = new List<InputModel>();
-
-                var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
                 using (StreamReader r = new StreamReader(file))
                 {
                     string json = r.ReadToEnd();
-                    outList = JsonConvert.DeserializeObject<List<InputModel>>(json);
+                    outList = JsonConvert.DeserializeObject<List<T>>(json);
                 }
 
                 Console.WriteLine($"Import file - count of rows: {outList.Count}");
@@ -46,9 +31,8 @@ namespace Lab2
             }
         }
 
-        public static void WriteToJsonFile(List<InputModel> inputModels)
+        public static void WriteToJsonFile<T>(List<T> inputModels, string file)
         {
-            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             using (StreamWriter newFile = File.CreateText(file))
             {
                 JsonSerializer serializer = new JsonSerializer();
@@ -56,141 +40,69 @@ namespace Lab2
             }
         }
 
-        public static void WriteFile(List<InputModel> inputModels)
+        public static List<T> AddRow<T>(T newRow, string file)
         {
-            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.csv");
-
-            File.Delete(file);
-
-            using (var stream = File.CreateText(file))
-            {
-                string csvRow;
-
-                int? ID = null;
-                string URL, title, photoURl, transactionNumber;
-                DateTime? startDate, endDate;
-                decimal? price;
-
-                foreach (var row in inputModels)
-                {
-                    csvRow = string.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
-                        ID = row.ID == null ? null : (int?)row.ID.Value,
-                        URL = row.URL,
-                        startDate = row.StartDate,
-                        endDate = row.EndDate,
-                        price = row.Price,
-                        title = row.Title,
-                        photoURl = row.PhotoURl,
-                        transactionNumber = row.TransactionNumber
-                     );
-
-                    stream.WriteLine(csvRow);
-                }
-            }
-        }
-
-        public static List<InputModel> AddRow(List<InputModel> input, string id, string url, string startDate, string endDate, string price, string title, string photoURl, string transactionNumber)
-        {
-
-            InputModel addNewRow = new InputModel
-            {
-
-                ID = Validation.ValidateId(id),
-                URL = Validation.ValidateURL(url),
-                StartDate = Validation.ValidateDate(startDate),
-                EndDate = Validation.ValidateDate(endDate),
-                PhotoURl = Validation.ValidateURL(photoURl),
-                Price = Validation.ValidatePrice(price),
-                Title = Validation.ValidateTitle(title),
-                TransactionNumber = Validation.ValidateTransactionNumber(transactionNumber)
-            };
-
-            input.Add(addNewRow);
-            WriteFile(input);
+            List<T> input = ParceFileToModel<T>(file);
+            input.Add(newRow);
+            WriteToJsonFile<T>(input, file);
             return input;
-
-
         }
-        public static List<InputModel> DeleteRow(List<InputModel> input, int id)
+        public static List<T> DeleteRow<T>(T deleteRow, string file)
         {
-            var delRow = input.FirstOrDefault(i => i.ID == id);
-            input.Remove(delRow);
-
-            WriteToJsonFile(input);
+            var input = ParceFileToModel<T>(file);
+            input.Remove(deleteRow);
+            WriteToJsonFile<T>(input, file);
             return input;
         }
 
-        public static List<InputModel> UpdateRow(List<InputModel> input,string updateId, string property, string value)
+        public static List<InputModel> UpdateRow(List<InputModel> input, string updateId, string property, string value)
         {
             int.TryParse(updateId, out int id);
             foreach (var row in input.Where(w => w.ID == id))
             {
-                if(property == "URL")
+                if (property == "URL")
                 {
                     row.URL = Validation.ValidateURL(value);
                 }
-                if(property == "Price")
+                if (property == "Price")
                 {
                     row.Price = Validation.ValidatePrice(value);
                 }
-                if(property == "StartDate")
+                if (property == "StartDate")
                 {
                     row.StartDate = Validation.ValidateDate(value);
                 }
 
             }
-            WriteFile(input);
             return input;
         }
 
-        public static List<InputModel> Sort(List<InputModel> input, string property)
+        public static List<T> Sort<T>(List<T> input, string property, string file, int order = 0)
         {
-            return input.OrderByDescending(p => p.GetType()
-                                       .GetProperty(property)
-                                       .GetValue(p, null)).ToList();
+            List<T> sortInput;
+            if (order != 0)
+            {
+                sortInput = input.OrderBy(p => p.GetType()
+                    .GetProperty(property)
+                    .GetValue(p, null)).ToList();
+            }
+            else
+            {
+                sortInput = input.OrderByDescending(p => p.GetType()
+                    .GetProperty(property)
+                    .GetValue(p, null)).ToList();
+            }
 
+            WriteToJsonFile<T>(sortInput, file);
+
+            return sortInput;
         }
 
-        public static List<InputModel> Filter(List<InputModel> input, string property, string value)
+        public static List<T> Filter<T>(string file, Dictionary<string, string> filter)
         {
-            if (property == "ID")
-            {
-                int.TryParse(value, out int id);
-                return input.Where(w => w.ID == id).ToList();
-            }
-            if (property == "URL")
-            {
-                return input.Where(w => w.URL.Contains(value)).ToList();
-            }
-            if (property == "StartDate")
-            {
-                var date = Validation.ValidateDate(value);
-                return input.Where(w => w.StartDate == date).ToList();
-            }
-            if (property == "EndDate")
-            {
-                var date1 = Validation.ValidateDate(value);
-                return input.Where(w => w.EndDate == date1).ToList();
-            }
-            if (property == "Price")
-            {
-                var price = Validation.ValidatePrice(value);
-                return input.Where(w => w.Price == price).ToList();
-            }
-            if (property == "Title")
-            {
-                return input.Where(w => w.Title.Contains(value)).ToList();
-            }
-            if (property == "PhotoURL")
-            {
-                return input.Where(w => w.PhotoURl.Contains(value)).ToList();
-            }
-            if (property == "TransactionNumber")
-            {
-                return input.Where(w => w.TransactionNumber == value).ToList();
-            }
+            
 
-            return new List<InputModel>();
+            return new List<T>();
         }
 
         public static void PrintFileModel(List<InputModel> inputModels)
@@ -214,5 +126,4 @@ namespace Lab2
         }
     }
 }
-            
-  
+
