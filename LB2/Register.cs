@@ -21,6 +21,7 @@ namespace Lab2
                 {
                     Admin admin = new Admin();
                     admin.Role = user.Role;
+                    Admin.WorksMenu();
                 }
                 else
                 if (user.Role == "Staff")
@@ -29,7 +30,7 @@ namespace Lab2
                     staff.Role = user.Role;
                     staff.Salary = user.Salary.HasValue ? user.Salary.Value : null;
                     staff.FirstDayInCompany = user.FirstDateInCompany.HasValue ? user.FirstDateInCompany.Value : null;
-
+                    Staff.WorksMenu();
                 }
                 else
                 {
@@ -42,5 +43,18 @@ namespace Lab2
             }
         }
 
+        public static void AddUser()
+        {
+            
+        }
+        public static void UpdateUser()
+        {
+
+        }
+
+        public static void DeleteUser()
+        {
+
+        }
     }
 }

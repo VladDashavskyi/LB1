@@ -4,14 +4,16 @@
     "LastName": "Skot",
     "Email": "admin@gmail.com",
     "Role": "Admin",
-    "Password": ""
+    "Password": "qwerty123",
+    "Salary": "",
+    "FirstDateInCompany": ""
   },
   {
     "FirstName": "Staff1",
     "LastName": "Staff1",
     "Email": "staf1@gmail.com",
     "Role": "Staff",
-    "Password": "",
+    "Password": "qwerty123",
     "Salary": "250",
     "FirstDateInCompany": "01.01.2021"
   },

@@ -92,7 +92,7 @@ namespace Lab2
 
         public static string ValidatePassword(string password)
         {
-            Regex r = new Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$");
+            Regex r = new Regex(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,16}$");
             if (!r.IsMatch(password.Trim()))
             {
                 throw new Exception("ValidationError: Password - is not valid");
