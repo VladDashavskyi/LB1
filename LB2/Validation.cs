@@ -18,7 +18,7 @@ namespace Lab2
         }
         public static string ValidateURL(string url)
         {
-            if (url.Substring(0, 4) == ("https"))
+            if (url.Substring(0, 5) != ("https"))
             {
                 throw new Exception("ValidationError: URL - is not valid");
             }

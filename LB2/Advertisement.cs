@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using LB2.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace Lab2
 {
@@ -32,129 +37,231 @@ namespace Lab2
             }
         }
 
-        public static void WriteToJsonFile<T>(List<T> inputModels, string file)
+        public static IQueryable<JToken> ParceFileToModel(string file)
         {
-            using (StreamWriter newFile = File.CreateText(file))
+            IQueryable<JToken> data ;
+            using (StreamReader r = new StreamReader(file))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(newFile, inputModels);
+                string stringJson = r.ReadToEnd();
+                var json = JsonConvert.DeserializeObject<dynamic>(stringJson);
+                data = ((JToken)json).Children().AsQueryable();
+            }
+
+            return data;
+        }
+
+        public static void WriteToJsonFile<T>(List<T> inputModel, string file)
+        {
+            try
+            {
+                using (StreamWriter newFile = File.CreateText(file))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(newFile, inputModel);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
 
-        public static List<T> AddRow<T>(T newRow, string file)
+        public static void AddRow(string file, List<Dictionary<string, object>> inputModel)
         {
-            List<T> input = ParceFileToModel<T>(file);
-            input.Add(newRow);
-            WriteToJsonFile<T>(input, file);
-            return input;
+            WriteToJsonFile(inputModel, file);
         }
-        public static List<T> DeleteRow<T>(List<T> inputModels, string property, object id, string file)
+        public static void DeleteRow<T>(string file, List<Dictionary<string, object>> inputModel, string keyRows,
+            T id)
         {
-            var newInputModels = new List<T>();
-            foreach (var item in inputModels)
             {
-                var propertyInfo = item.GetType().GetProperty(property);
-                var propertyValue = propertyInfo.GetValue(item, null);
-                if (propertyValue.ToString() == id.ToString())
+                try
                 {
-                    newInputModels.Remove(item);
+                    foreach (var item in inputModel)
+                    {
+                        foreach (KeyValuePair<string, object> kvp in item)
+                        {
+                            if (kvp.Key == keyRows && kvp.Value.ToString() == id.ToString())
+                            {
+                                inputModel.Remove(item);
+                                WriteToJsonFile(inputModel, file);
+                                return;
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+        }
+
+        public static void UpdateRow<T>(string file, List<Dictionary<string, object>> inputModel, string keyRows,
+            T rowId, Dictionary<string, T> kv)
+        {
+            try
+            {
+                foreach (var item in inputModel)
+                {
+                    foreach (KeyValuePair<string, object> kvp in item)
+                    {
+                        if (kvp.Key == keyRows && kvp.Value.ToString() == rowId.ToString())
+                        {
+                            foreach (var k in kv)
+                            {
+                                item[k.Key] = k.Value;
+                            }
+                        }
+                    }
+                }
+
+                WriteToJsonFile(inputModel, file);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public static void Sort(string file, List<Dictionary<string, object>> inputModel, string key, int order = 0)
+        {
+            try
+            {
+                List<Dictionary<string, object>> sortModel = new List<Dictionary<string, object>>();
+                if (order == 0)
+                    sortModel = inputModel.OrderBy(x => x.ContainsKey(key) ? x[key] : string.Empty).ToList();
+
+                if (order == 1)
+                    sortModel = inputModel.OrderByDescending(x => x.ContainsKey(key) ? x[key] : string.Empty).ToList();
+
+                if (sortModel.Count > 0)
+                    WriteToJsonFile(sortModel, file);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public static void Filter<T>(List<Dictionary<string, object>> inputModel, string key, T value)
+        {
+            try
+            {
+                List<Dictionary<string, object>> filterModel = new List<Dictionary<string, object>>();
+                foreach (var item in inputModel)
+                {
+                    foreach (KeyValuePair<string, object> kvp in item)
+                    {
+                        if (kvp.Key == key && kvp.Value.ToString().Contains(value.ToString()))
+                        {
+                            filterModel.Add(item);
+                        }
+                    }
+                }
+
+                WriteConsoleDictionary(filterModel);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public static List<string> PrintFileColumnModel(List<Dictionary<string, object>> inputModel, bool printConsole = true, bool IsPrintId = true)
+        {
+            List<string> columnNames = new List<string>();
+
+            foreach (var item in inputModel.Take(1))
+            {
+                if (printConsole)
+                    Console.WriteLine("Columns name");
+                foreach (KeyValuePair<string, object> kvp in item)
+                {
+                    if ((kvp.Key == "ID" && !IsPrintId))
+                        continue;
+
+                    columnNames.Add(kvp.Key);
+                    if (printConsole)
+                        Console.WriteLine(kvp.Key);
+
+                }
+            }
+
+            return columnNames;
+        }
+         
+        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = true)
+        {
+            try
+            {
+                var parceFileToModel = ParceFileToModel(file);
+
+                JArray dict = new JArray();
+
+                List<Dictionary<string, object>> model = new List<Dictionary<string, object>>();
+                foreach (var item in parceFileToModel)
+                {
+
+                    var d = ConvertToDictionary(item.ToString());
+                    dict.Add(item);
+                    model.Add(d);
+                }
+
+                if (printFileToConsole)
+                WriteConsoleDictionary(model);
+
+                return model;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private static Dictionary<string, object> ConvertToDictionary(string jsonData)
+        {
+            var val = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonData);
+            var val2 = new Dictionary<string, object>();
+            foreach (KeyValuePair<string, object> dict in val)
+            {
+                if (dict.Value is JObject)
+                {
+                    val2.Add(dict.Key, ConvertToDictionary(dict.Value.ToString()));
                 }
                 else
                 {
-                    newInputModels.Add(item);
+                    val2.Add(dict.Key, dict.Value);
                 }
             }
-            WriteToJsonFile<T>(newInputModels, file);
-            return newInputModels;
+            return val2;
         }
 
-        public static List<T> UpdateRow<T>(List<T> inputModels, T updateRow, string property, object id, string file)
+        private static void WriteConsoleDictionary(List<Dictionary<string, object>> inputModel)
         {
-            var newInputModels = new List<T>();
-            foreach (var item in inputModels)
+            Console.WriteLine($"Import file - count of rows: {inputModel.Count}");
+            string s = String.Empty;
+            foreach (var item in inputModel.Take(1))
             {
-                var propertyInfo = item.GetType().GetProperty(property);
-                var propertyValue = propertyInfo.GetValue(item, null);
-                if (propertyValue == id)
+                foreach (KeyValuePair<string, object> kvp in item)
                 {
-                    newInputModels.Remove(item);
-                    newInputModels.Add(updateRow);
-                }
-                else
-                {
-                    newInputModels.Add(item);
+                    s = String.Join("  ", s, kvp.Key);
                 }
             }
-            WriteToJsonFile<T>(newInputModels, file);
-            return newInputModels;
-        }
-
-        public static List<T> Sort<T>(List<T> input, string property, string file, int order = 0)
-        {
-            List<T> sortInput;
-            if (order != 0)
+            Console.WriteLine(s);
+            foreach (var item in inputModel)
             {
-                sortInput = input.OrderBy(p => p.GetType()
-                    .GetProperty(property)
-                    .GetValue(p, null)).ToList();
-            }
-            else
-            {
-                sortInput = input.OrderByDescending(p => p.GetType()
-                    .GetProperty(property)
-                    .GetValue(p, null)).ToList();
-            }
-
-            WriteToJsonFile<T>(sortInput, file);
-
-            return sortInput;
-        }
-
-        public static List<T> Filter<T>(List<T> inputModels, string property, string value)
-        {
-            var filterInputModels = new List<T>();
-            foreach (var item in inputModels)
-            {
-                var propertyInfo = item.GetType().GetProperty(property);
-                if (propertyInfo == null)
+                foreach (KeyValuePair<string, object> kvp in item)
                 {
-                    throw new Exception("property does not exists");
+                    Console.Write(kvp.Value + "  ");
                 }
-
-                var propertyValue = propertyInfo.GetValue(item, null).ToString();
-                if (propertyValue == value)
-                {
-                    filterInputModels.Add(item);
-                }
-            }
-
-            return filterInputModels;
-        }
-
-        public static void PrintFileModel<T>(List<T> inputModels)
-        {
-            if (inputModels == null)
-            {
-                throw new Exception("Invalid input file");
-            }
-
-            var props = typeof(T).GetProperties();
-
-            foreach (var prop in props)
-            {
-                Console.Write("{0}\t", prop.Name);
-            }
-            Console.WriteLine();
-
-            foreach (var item in inputModels)
-            {
-                foreach (var prop in props)
-                {
-                    Console.Write("{0}\t", prop.GetValue(item, null));
-                }
-                Console.WriteLine();
+                Console.Write("\t\n");
             }
         }
     }
 }
-
