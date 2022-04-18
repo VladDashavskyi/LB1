@@ -21,7 +21,7 @@ namespace Lab2
             {
                 Console.WriteLine(String.Join(" - ", (int)menu, menu));
             }
-
+            
             Console.WriteLine("Make a choice" + "\r\n");
         }
 
@@ -41,6 +41,7 @@ namespace Lab2
                         switch (menuId)
                         {
                             case (int)StaffMenu.Add:
+                                Advertisement.WriteConsoleDictionary(ReadStatusModel());
                                 break;
                                 
                             case (int)StaffMenu.Remove:
@@ -67,6 +68,46 @@ namespace Lab2
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private static List<Dictionary<string, object>> ReadStatusModel()
+        {
+            var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
+            var inputFile = Advertisement.GetListDictionaryFromFile(statusFile, false);
+
+            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
+            var inputModel = Advertisement.GetListDictionaryFromFile(file, false);
+
+            List<int> filterModel = new List<int>();
+            foreach (var item in inputFile)
+            {
+                foreach (KeyValuePair<string, object> kvp in item)
+                {
+                    if (kvp.Key == "Email" && kvp.Value.ToString().Contains("staf1@gmail.com"))
+                    {
+                        filterModel.Add(int.Parse(item.FirstOrDefault( x=> x.Key == "ID").Value.ToString()));
+                    }
+                }
+            }
+
+            List<Dictionary<string, object>> outputModel = new List<Dictionary<string, object>>();
+
+            foreach (var item in filterModel)
+            {
+                foreach (var itemOut in inputModel)
+                {
+                    foreach (KeyValuePair<string, object> kvp in itemOut.Where(w => w.Key == "ID"))
+                    {
+                        if (kvp.Value.ToString() == item.ToString())
+                        {
+                            outputModel.Add(itemOut);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            return outputModel;
         }
 
     }

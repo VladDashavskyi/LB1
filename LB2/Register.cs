@@ -19,6 +19,7 @@ namespace Lab2
             {
                 if (user.Role == "Admin")
                 {
+                    Console.WriteLine("Welcome {0},{1}, U logged as {2}", user.FirstName, user.LastName, user.Role);
                     Admin admin = new Admin();
                     admin.Role = user.Role;
                     Admin.WorksMenu();
@@ -26,10 +27,12 @@ namespace Lab2
                 else
                 if (user.Role == "Staff")
                 {
+                    Console.WriteLine("Welcome {0},{1}, U logged as {2}", user.FirstName, user.LastName,user.Role);
                     Staff staff = new Staff();  
                     staff.Role = user.Role;
                     staff.Salary = user.Salary.HasValue ? user.Salary.Value : null;
                     staff.FirstDayInCompany = user.FirstDateInCompany.HasValue ? user.FirstDateInCompany.Value : null;
+                    staff.Email = user.Email;
                     Staff.WorksMenu();
                 }
                 else

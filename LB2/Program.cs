@@ -156,7 +156,7 @@ namespace Lab2
                 }
                 if (column == "Salary")
                 {
-                    arg.Add(column, Validation.ValidatePrice(Console.ReadLine()));
+                    arg.Add(column, Validation.ValidateSalary(Console.ReadLine()));
                     continue;
                 }
                 if (column == "FirstDateInCompany")

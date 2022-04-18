@@ -99,5 +99,16 @@ namespace Lab2
             }
             return password.Trim();
         }
+
+        public static int ValidateSalary(string salary)
+        {
+            if(!int.TryParse(salary, out int sal) && sal > 0)
+            {
+                throw new Exception("ValidationError: Salary - is not valid");
+            } 
+            return sal;
+        }
     }
 }
+
+

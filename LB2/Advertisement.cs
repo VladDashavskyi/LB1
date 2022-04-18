@@ -242,7 +242,7 @@ namespace Lab2
             return val2;
         }
 
-        private static void WriteConsoleDictionary(List<Dictionary<string, object>> inputModel)
+        public static void WriteConsoleDictionary(List<Dictionary<string, object>> inputModel)
         {
             Console.WriteLine($"Import file - count of rows: {inputModel.Count}");
             string s = String.Empty;
