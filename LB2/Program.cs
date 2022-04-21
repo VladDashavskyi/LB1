@@ -11,7 +11,8 @@ namespace Lab2
         static void Main(string[] args)
         {
             bool IsValidate = true;
-
+            try
+            {
             var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
             var userFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\User.json");
@@ -27,60 +28,62 @@ namespace Lab2
             PrintMenu();
 
             string action = string.Empty;
-            try
-            {
+
                 while (action != "6")
                 {
-                    action = Console.ReadLine();
-                    int menuId = 0;
+                        action = Console.ReadLine();
+                        int menuId = 0;
 
-                    if (int.TryParse(action, out menuId))
-                    {
-                        switch (menuId)
+                        if (int.TryParse(action, out menuId))
                         {
-                            case (int)Menu.Add:
-                                Add(inputFile, arg, IsValidate);
-                                break;
-                            case (int)Menu.Remove:
-                                Console.WriteLine("ID");
-                                int.TryParse(Console.ReadLine(), out rowId);
-                                break;
-                            case (int)Menu.Search:
-                                var columns = Advertisement.PrintFileColumnModel(inputFile, true);
-                                Console.WriteLine("Choose column");
-                                key = Console.ReadLine();
-                                Console.WriteLine("Choose order");
-                                value = Console.ReadLine();
-                                arg.Add(key, value);
-                                break;
-                            case (int)Menu.Sort:
-                                columns = Advertisement.PrintFileColumnModel(inputFile, true);
-                                Console.WriteLine("Choose column");
-                                key = Console.ReadLine();
-                                Console.WriteLine("Choose order");
-                                value = Console.ReadLine();
-                                arg.Add(key, value);
-                                break;
-                            case (int)Menu.Update:
 
-                                rowId = Update(inputFile, arg, IsValidate);
+                            switch (menuId)
+                            {
+                                case (int)Menu.Add:
+                                    Add(inputFile, arg, IsValidate);
+                                    break;
+                                case (int)Menu.Remove:
+                                    Console.WriteLine("ID");
+                                    int.TryParse(Console.ReadLine(), out rowId);
+                                    break;
+                                case (int)Menu.Search:
+                                    var columns = Advertisement.PrintFileColumnModel(inputFile, true);
+                                    Console.WriteLine("Choose column");
+                                    key = Console.ReadLine();
+                                    Console.WriteLine("Choose order");
+                                    value = Console.ReadLine();
+                                    arg.Add(key, value);
+                                    break;
+                                case (int)Menu.Sort:
+                                    columns = Advertisement.PrintFileColumnModel(inputFile, true);
+                                    Console.WriteLine("Choose column");
+                                    key = Console.ReadLine();
+                                    Console.WriteLine("Choose order");
+                                    value = Console.ReadLine();
+                                    arg.Add(key, value);
+                                    break;
+                                case (int)Menu.Update:
 
-                                break;
+                                    rowId = Update(inputFile, arg, IsValidate);
+
+                                    break;
+                            }
                         }
-                    }
 
-                    Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
-                    handler.HandlerRun(menu, rowId, arg);
-                    arg = new Dictionary<string, object>();
-                    key = String.Empty;
-                    value = String.Empty;
-                    rowId = 0;
-                    PrintMenu();
-                }
+
+                        Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
+                        handler.HandlerRun(menu, rowId, arg);
+                        arg = new Dictionary<string, object>();
+                        key = String.Empty;
+                        value = String.Empty;
+                        rowId = 0;
+                        PrintMenu();
+                                       
+                    }
             }
-            catch (Exception ex)
+            catch (Exception ar)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ar.Message);
             }
         }
 
@@ -105,33 +108,143 @@ namespace Lab2
 
                 if (isValidate)
                 {
+                    if (column == "ID")
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateId(Console.ReadLine());
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if(i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
+                        continue;
+
+                    }
                     if (column == "URL")
                     {
-                        arg.Add(column, Validation.ValidateURL(Console.ReadLine()));
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateURL(Console.ReadLine());
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
                         continue;
                     } if (column == "StartDate")
                     {
-                        arg.Add(column, Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy"));
-                        continue;
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateDate(Console.ReadLine());
+
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1.Date.ToString("MM/dd/yyyy"));
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
+                        continue;                        
                     }if (column == "EndDate")
                     {
-                        arg.Add(column, Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy"));
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateDate(Console.ReadLine());
+
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1.Date.ToString("MM/dd/yyyy"));
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
                         continue;
-                    }if (column == "Price")
+                    }
+                    if (column == "Price")
                     {
-                        arg.Add(column, Validation.ValidatePrice(Console.ReadLine()));
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidatePrice(Console.ReadLine());
+
+                        if (valid.Item2 == true)
+                            {
+                                arg.Add(column, Math.Round(valid.Item1, 2));
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+                        }                        
                         continue;
+
                     }if (column == "Title")
                     {
                         arg.Add(column, Validation.ValidateTitle(Console.ReadLine()));
                         continue;
                     }if (column == "PhotoURL")
                     {
-                        arg.Add(column, Validation.ValidateURL(Console.ReadLine()));
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateURL(Console.ReadLine());
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
                         continue;
-                    }if (column == "TransactionNumber")
+                    }
+                    if (column == "TransactionNumber")
                     {
-                        arg.Add(column, Validation.ValidateTransactionNumber(Console.ReadLine()));
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateTransactionNumber(Console.ReadLine());
+                        if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+                        }
                         continue;
                     }
                     else
@@ -162,23 +275,23 @@ namespace Lab2
                 if (key == "URL")
                 {
                     Console.WriteLine("New value");
-                    string value = Validation.ValidateURL(Console.ReadLine());
-                    arg.Add(key, value);
+                    var value = Validation.ValidateURL(Console.ReadLine());
+                    arg.Add(key, value.Item1);
                 }if(key == "StartDate")
                 {
                     Console.WriteLine("New value");
-                    var value = Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy");
-                    arg.Add(key, value);
+                    var value = Validation.ValidateDate(Console.ReadLine());
+                    arg.Add(key, value.Item1.Date.ToString("MM/dd/yyyy"));
                 }if(key == "EndDate")
                 {
                     Console.WriteLine("New value");
-                    var value = Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy");
-                    arg.Add(key, value);
+                    var value = Validation.ValidateDate(Console.ReadLine());
+                    arg.Add(key, value.Item1.Date.ToString("MM/dd/yyyy"));
                 }if(key == "Price")
                 {
                     Console.WriteLine("New value");
                     var value = Validation.ValidatePrice(Console.ReadLine());
-                    arg.Add(key, value);
+                    arg.Add(key, Math.Round(value.Item1, 2));
                 }if (key == "Title")
                 {
                     Console.WriteLine("New value");
@@ -187,13 +300,13 @@ namespace Lab2
                 }if (key == "PhotoURL")
                 {
                     Console.WriteLine("New value");
-                    string value = Validation.ValidateURL(Console.ReadLine());
-                    arg.Add(key, value);
+                    var value = Validation.ValidateURL(Console.ReadLine());
+                    arg.Add(key, value.Item1);
                 }if (key == "TransactionNumber")
                 {
                     Console.WriteLine("New value");
-                    string value = Validation.ValidateTransactionNumber(Console.ReadLine());
-                    arg.Add(key, value);
+                    var value = Validation.ValidateTransactionNumber(Console.ReadLine());
+                    arg.Add(key, value.Item1);
                 }                
             }
             else

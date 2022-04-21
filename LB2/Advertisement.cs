@@ -13,8 +13,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Lab2
 {
-    public static class Advertisement
+    public class Advertisement
     {
+        private readonly bool isValidate;
+        public Advertisement(bool _isValidate)
+        {
+            _isValidate = isValidate;
+        }
         public static List<T> ParceFileToModel<T>(string file)
         {
             try
@@ -46,7 +51,7 @@ namespace Lab2
                 var json = JsonConvert.DeserializeObject<dynamic>(stringJson);
                 data = ((JToken)json).Children().AsQueryable();
             }
-
+            
             return data;
         }
 
@@ -208,6 +213,54 @@ namespace Lab2
                 {
 
                     var d = ConvertToDictionary(item.ToString());
+                    if (true)
+                    {
+                        foreach (var i in d)
+                        {
+                            if (i.Key == "ID")
+                            {
+                                if(!Validation.ValidateId(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
+                                continue;
+                            }
+                            if (i.Key == "URL")
+                            {
+                                if (!Validation.ValidateURL(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
+                                continue;
+                            }
+                            if (i.Key == "StartDate")
+                            {
+                                if (!Validation.ValidateDate(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  "); ;
+                                continue;
+                            }
+                            if (i.Key == "EndDate")
+                            {
+                                if (!Validation.ValidateDate(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
+                                continue;
+                            }
+                            if (i.Key == "Price")
+                            {
+                                if (!Validation.ValidatePrice(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
+                                continue;
+                            }
+                            if (i.Key == "PhotoURL")
+                            {
+                                if (!Validation.ValidateURL(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  "); 
+                                continue;
+                            }
+                            if (i.Key == "TransactionNumber")
+                            {
+                                if (!Validation.ValidateTransactionNumber(i.Value.ToString()).Item2)
+                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
+                                continue;
+                            }
+                        }
+                    }
                     dict.Add(item);
                     model.Add(d);
                 }
