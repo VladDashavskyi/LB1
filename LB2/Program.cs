@@ -16,8 +16,8 @@ namespace Lab2
             var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
             var userFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\User.json");
-            Handler<Menu> handler = new Handler<Menu>(file);
-            var inputFile = Advertisement.GetListDictionaryFromFile(file);
+            Handler<Menu> handler = new Handler<Menu>(file, IsValidate);
+            var inputFile = Advertisement.GetListDictionaryFromFile(file, true, IsValidate);
 
             Dictionary<string, object> arg = new Dictionary<string, object>();
             int rowId = 0;

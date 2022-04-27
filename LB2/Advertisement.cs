@@ -200,7 +200,7 @@ namespace Lab2
             return columnNames;
         }
          
-        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = true)
+        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = true, bool isValidate = true)
         {
             try
             {
@@ -213,52 +213,12 @@ namespace Lab2
                 {
 
                     var d = ConvertToDictionary(item.ToString());
-                    if (true)
+                    if (isValidate)
                     {
                         foreach (var i in d)
                         {
-                            if (i.Key == "ID")
-                            {
-                                if(!Validation.ValidateId(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
-                                continue;
-                            }
-                            if (i.Key == "URL")
-                            {
-                                if (!Validation.ValidateURL(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
-                                continue;
-                            }
-                            if (i.Key == "StartDate")
-                            {
-                                if (!Validation.ValidateDate(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  "); ;
-                                continue;
-                            }
-                            if (i.Key == "EndDate")
-                            {
-                                if (!Validation.ValidateDate(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
-                                continue;
-                            }
-                            if (i.Key == "Price")
-                            {
-                                if (!Validation.ValidatePrice(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
-                                continue;
-                            }
-                            if (i.Key == "PhotoURL")
-                            {
-                                if (!Validation.ValidateURL(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  "); 
-                                continue;
-                            }
-                            if (i.Key == "TransactionNumber")
-                            {
-                                if (!Validation.ValidateTransactionNumber(i.Value.ToString()).Item2)
-                                    throw new Exception($"Validation Error! Please change value {i.Value.ToString()} for correct work  ");
-                                continue;
-                            }
+                            Validation.ValidateInputFile(i.Key, i.Value);
+                            continue;
                         }
                     }
                     dict.Add(item);

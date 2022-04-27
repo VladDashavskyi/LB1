@@ -13,10 +13,10 @@ namespace Lab2
         private readonly string _inputFile;
         private List<Dictionary<string, object>> dictionary;
 
-        public Handler(string inputFile)
+        public Handler(string inputFile, bool isValidate = true)
         {
             _inputFile = inputFile;
-            dictionary = Advertisement.GetListDictionaryFromFile(_inputFile,false);
+            dictionary = Advertisement.GetListDictionaryFromFile(_inputFile,false, isValidate);
             _handlers = new Dictionary<Menu, Func<int, Dictionary<string, object>, Task>>
             {
                 { Menu.Sort, HandleSortFile },

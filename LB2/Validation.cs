@@ -101,5 +101,44 @@ namespace Lab2
             }
             return password.Trim();
         }
+
+        public static void ValidateInputFile(string key, object value)
+        {
+            if (key == "ID")
+            {
+                if (!Validation.ValidateId(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "URL")
+            {
+                if (!Validation.ValidateURL(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "StartDate")
+            {
+                if (!Validation.ValidateDate(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  "); ;
+            }
+            if (key == "EndDate")
+            {
+                if (!Validation.ValidateDate(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "Price")
+            {
+                if (!Validation.ValidatePrice(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "PhotoURL")
+            {
+                if (!Validation.ValidateURL(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "TransactionNumber")
+            {
+                if (!Validation.ValidateTransactionNumber(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+        }
     }
 }
