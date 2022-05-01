@@ -9,9 +9,9 @@ using Lab2.Enum;
 
 namespace Lab2
 {
-    public class Staff: User
+    public class Staff : User
     {
-        public int? Salary { get; set;}
+        public int? Salary { get; set; }
         public DateTime? FirstDayInCompany { get; set; }
 
         private static void PrintMenu()
@@ -21,13 +21,14 @@ namespace Lab2
             {
                 Console.WriteLine(String.Join(" - ", (int)menu, menu));
             }
-            
+
             Console.WriteLine("Make a choice" + "\r\n");
         }
 
-        public static void WorksMenu()
+        public static void WorksMenu(string email)
         {
             PrintMenu();
+            Advertisement.WriteConsoleDictionary(ReadStatusModel(email));
             string action = string.Empty;
             try
             {
@@ -41,9 +42,9 @@ namespace Lab2
                         switch (menuId)
                         {
                             case (int)StaffMenu.Add:
-                                Advertisement.WriteConsoleDictionary(ReadStatusModel());
+
                                 break;
-                                
+
                             case (int)StaffMenu.Remove:
                                 break;
                             case (int)StaffMenu.Update:
@@ -70,38 +71,29 @@ namespace Lab2
             }
         }
 
-        private static List<Dictionary<string, object>> ReadStatusModel()
+        private static List<Dictionary<string, object>> ReadStatusModel(string email)
         {
+
             var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
-            var inputFile = Advertisement.GetListDictionaryFromFile(statusFile, false);
+            var statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile).Where(w => w.Email == email);
 
             var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             var inputModel = Advertisement.GetListDictionaryFromFile(file, false);
 
-            List<int> filterModel = new List<int>();
-            foreach (var item in inputFile)
-            {
-                foreach (KeyValuePair<string, object> kvp in item)
-                {
-                    if (kvp.Key == "Email" && kvp.Value.ToString().Contains("staf1@gmail.com"))
-                    {
-                        filterModel.Add(int.Parse(item.FirstOrDefault( x=> x.Key == "ID").Value.ToString()));
-                    }
-                }
-            }
-
             List<Dictionary<string, object>> outputModel = new List<Dictionary<string, object>>();
 
-            foreach (var item in filterModel)
+            foreach (var item in statusModel)
             {
                 foreach (var itemOut in inputModel)
                 {
-                    foreach (KeyValuePair<string, object> kvp in itemOut.Where(w => w.Key == "ID"))
+                    foreach (KeyValuePair<string, object> kvp in itemOut.Where(w => w.Key == "ID").ToList())
                     {
-                        if (kvp.Value.ToString() == item.ToString())
+                        if (kvp.Value.ToString() == item.ID.ToString())
                         {
+                            itemOut.Add("Status", item.Status);
+                            itemOut.Add("Message", item.Message);
                             outputModel.Add(itemOut);
-                            continue;
+
                         }
                     }
                 }
@@ -109,6 +101,5 @@ namespace Lab2
 
             return outputModel;
         }
-
     }
 }

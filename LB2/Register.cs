@@ -27,17 +27,17 @@ namespace Lab2
                 else
                 if (user.Role == "Staff")
                 {
-                    Console.WriteLine("Welcome {0},{1}, U logged as {2}", user.FirstName, user.LastName,user.Role);
-                    Staff staff = new Staff();  
+                    Console.WriteLine("Welcome {0}, {1}, U logged as {2}", user.FirstName, user.LastName, user.Role);
+                    Staff staff = new Staff();
                     staff.Role = user.Role;
                     staff.Salary = user.Salary.HasValue ? user.Salary.Value : null;
                     staff.FirstDayInCompany = user.FirstDateInCompany.HasValue ? user.FirstDateInCompany.Value : null;
                     staff.Email = user.Email;
-                    Staff.WorksMenu();
+                    Staff.WorksMenu(staff.Email);
                 }
                 else
                 {
-                    Console.WriteLine("User ");    
+                    Console.WriteLine("User ");
                 }
             }
             else
@@ -46,18 +46,6 @@ namespace Lab2
             }
         }
 
-        public static void AddUser()
-        {
-            
-        }
-        public static void UpdateUser()
-        {
 
-        }
-
-        public static void DeleteUser()
-        {
-
-        }
     }
 }

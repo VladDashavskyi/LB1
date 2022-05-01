@@ -27,7 +27,7 @@ namespace Lab2
                     outList = JsonConvert.DeserializeObject<List<T>>(json);
                 }
 
-                Console.WriteLine($"Import file - count of rows: {outList.Count}");
+                //Console.WriteLine($"Import file - count of rows: {outList.Count}");
                 return outList;
             }
             catch (Exception ex)
