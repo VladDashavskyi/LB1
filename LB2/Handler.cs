@@ -66,7 +66,7 @@ namespace Lab2
         {
             dictionary.Add(arg);
             Advertisement.AddRow(_inputFile, dictionary);
-            dictionary = Advertisement.GetListDictionaryFromFile(_inputFile);
+            dictionary = Advertisement.GetListDictionaryFromFile(_inputFile, false);
         }
 
         private Dictionary<string, object> AddRow(string key, object value)

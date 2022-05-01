@@ -110,11 +110,7 @@ namespace Lab2
             } 
             return sal;
         }
-    }
-}
-
-
-
+    
         public static void ValidateInputFile(string key, object value)
         {
             if (key == "ID")
