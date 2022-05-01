@@ -5,60 +5,62 @@ namespace Lab2
 {
     public static class Validation
     {
-        public static int ValidateId(string id)
+        public static (int,bool) ValidateId(string id)
         {
+            
             int result = 0;
 
             if (!int.TryParse(id, out result))
-            {
-                throw new Exception("ValidationError: Id - is not valid");
+            {              
+                Console.WriteLine("ValidationError: Id - is not valid");
+                return (result, false);
             }
 
-            return result;
+            return (result,true);
         }
-        public static string ValidateURL(string url)
+        public static (string,bool) ValidateURL(string url)
         {
             if (url.Substring(0, 5) != ("https"))
             {
-                throw new Exception("ValidationError: URL - is not valid");
+                Console.WriteLine("ValidationError: URL - is not valid");
+                return (url, false);
             }
-
-            return url.Trim();
+            return (url, true);
         }
-        public static DateTime ValidateDate(string date)
+        public static (DateTime,bool) ValidateDate(string date)
         {
             DateTime dateTime = DateTime.Now;
             if (!DateTime.TryParse(date, out dateTime))
             {
-                throw new Exception("ValidationError: Date - is not valid");
+                Console.WriteLine("ValidationError: Date - is not valid");
+                return (dateTime, false);
             }
-
-            return dateTime;
+            return (dateTime,true);
         }
-        public static decimal ValidatePrice(string price)
+        public static (decimal,bool) ValidatePrice(string price)
         {
             Regex r = new Regex(@"^\d+(\.\d{2})?$");
-
             if(!r.IsMatch(price.Trim()))
             {
-                throw new Exception("ValidationError: Price - is not valid");
+                Console.WriteLine("ValidationError: Price - is not valid");
+                return (decimal.Parse("0"), false);
             }
-            
-            return decimal.Parse(price);
+            var s = price;
+            return (decimal.Parse(price), true);
         }
-        public static string ValidateTransactionNumber(string transactionNumber)
+        public static (string,bool) ValidateTransactionNumber(string transactionNumber)
         {
             Regex r = new Regex(@"^[A-Z]{2}\-\d{3}\-\b[A-Z]{2}\/\d{2}");
             if (!r.IsMatch(transactionNumber.Trim()))
             {
-                throw new Exception("ValidationError: Tranasaction number - is not valid");
+                Console.WriteLine("ValidationError: Transaction Number - is not valid");
+                return (String.Empty, false);
             }
-            return transactionNumber.Trim();
+            return (transactionNumber.Trim(),true);
         }
         
         public static string ValidateTitle(string title)
-        {
-            
+        {          
             return title.Trim();
         }
 
@@ -112,3 +114,44 @@ namespace Lab2
 }
 
 
+
+        public static void ValidateInputFile(string key, object value)
+        {
+            if (key == "ID")
+            {
+                if (!Validation.ValidateId(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "URL")
+            {
+                if (!Validation.ValidateURL(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "StartDate")
+            {
+                if (!Validation.ValidateDate(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  "); ;
+            }
+            if (key == "EndDate")
+            {
+                if (!Validation.ValidateDate(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "Price")
+            {
+                if (!Validation.ValidatePrice(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "PhotoURL")
+            {
+                if (!Validation.ValidateURL(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+            if (key == "TransactionNumber")
+            {
+                if (!Validation.ValidateTransactionNumber(value.ToString()).Item2)
+                    throw new Exception($"Validation Error! Please change value {value.ToString()} for correct work  ");
+            }
+        }
+    }
+}

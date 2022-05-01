@@ -13,8 +13,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Lab2
 {
-    public static class Advertisement
+    public class Advertisement
     {
+        private readonly bool isValidate;
+        public Advertisement(bool _isValidate)
+        {
+            _isValidate = isValidate;
+        }
         public static List<T> ParceFileToModel<T>(string file)
         {
             try
@@ -46,7 +51,7 @@ namespace Lab2
                 var json = JsonConvert.DeserializeObject<dynamic>(stringJson);
                 data = ((JToken)json).Children().AsQueryable();
             }
-
+            
             return data;
         }
 
@@ -195,7 +200,7 @@ namespace Lab2
             return columnNames;
         }
          
-        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = true)
+        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = true, bool isValidate = true)
         {
             try
             {
@@ -208,6 +213,14 @@ namespace Lab2
                 {
 
                     var d = ConvertToDictionary(item.ToString());
+                    if (isValidate)
+                    {
+                        foreach (var i in d)
+                        {
+                            Validation.ValidateInputFile(i.Key, i.Value);
+                            continue;
+                        }
+                    }
                     dict.Add(item);
                     model.Add(d);
                 }

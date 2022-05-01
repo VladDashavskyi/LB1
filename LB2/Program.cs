@@ -28,6 +28,13 @@ namespace Lab2
                 Dictionary<string, object> arg = new Dictionary<string, object>();
                 AddUser(inputFile, arg, userFile);
             }
+            Handler<Menu> handler = new Handler<Menu>(file, IsValidate);
+            var inputFile = Advertisement.GetListDictionaryFromFile(file, true, IsValidate);
+
+            Dictionary<string, object> arg = new Dictionary<string, object>();
+            int rowId = 0;
+            string key = string.Empty;
+            string value = string.Empty;
 
             //bool IsValidate = true;
             //var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
@@ -41,6 +48,12 @@ namespace Lab2
             //string key = string.Empty;
             //string value = string.Empty;
 
+            string action = string.Empty;
+
+                while (action != "6")
+                {
+                        action = Console.ReadLine();
+                        int menuId = 0;
 
             //PrintMenu();
 
@@ -113,14 +126,71 @@ namespace Lab2
             Console.WriteLine("Make a choice" + "\r\n");
         }
 
+                        if (int.TryParse(action, out menuId))
+                        {
+
+                            switch (menuId)
+                            {
+                                case (int)Menu.Add:
+                                    Add(inputFile, arg, IsValidate);
+                                    break;
+                                case (int)Menu.Remove:
+                                    Console.WriteLine("ID");
+                                    int.TryParse(Console.ReadLine(), out rowId);
+                                    break;
+                                case (int)Menu.Search:
+                                    var columns = Advertisement.PrintFileColumnModel(inputFile, true);
+                                    Console.WriteLine("Choose column");
+                                    key = Console.ReadLine();
+                                    Console.WriteLine("Choose order");
+                                    value = Console.ReadLine();
+                                    arg.Add(key, value);
+                                    break;
+                                case (int)Menu.Sort:
+                                    columns = Advertisement.PrintFileColumnModel(inputFile, true);
+                                    Console.WriteLine("Choose column");
+                                    key = Console.ReadLine();
+                                    Console.WriteLine("Choose order");
+                                    value = Console.ReadLine();
+                                    arg.Add(key, value);
+                                    break;
+                                case (int)Menu.Update:
         private static void AddUser(List<Dictionary<string, object>> inputFile, Dictionary<string, object> arg, string file)
         {
             var columns = Advertisement.PrintFileColumnModel(inputFile, false);
 
+                                    rowId = Update(inputFile, arg, IsValidate);
             foreach (var column in columns)
             {
                 Console.WriteLine("Add value for column " + column);
 
+                                    break;
+                            }
+                        }
+
+
+                        Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
+                        handler.HandlerRun(menu, rowId, arg);
+                        arg = new Dictionary<string, object>();
+                        key = String.Empty;
+                        value = String.Empty;
+                        rowId = 0;
+                        PrintMenu();
+                                       
+                    }
+            }
+            catch (Exception ar)
+            {
+                Console.WriteLine(ar.Message);
+            }
+        }
+
+        private static void PrintMenu()
+        {
+            Console.WriteLine("MENU");
+            foreach (Menu menu in (Menu[])System.Enum.GetValues(typeof(Menu)))
+            {
+                Console.WriteLine(String.Join(" - ", (int)menu, menu));
                 if (column == "FirstName")
                 {
                     arg.Add(column, Validation.ValidateName(Console.ReadLine()));
@@ -186,33 +256,143 @@ namespace Lab2
 
                 if (isValidate)
                 {
+                    if (column == "ID")
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateId(Console.ReadLine());
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if(i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
+                        continue;
+
+                    }
                     if (column == "URL")
                     {
-                        arg.Add(column, Validation.ValidateURL(Console.ReadLine()));
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateURL(Console.ReadLine());
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
                         continue;
                     } if (column == "StartDate")
                     {
-                        arg.Add(column, Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy"));
-                        continue;
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateDate(Console.ReadLine());
+
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1.Date.ToString("MM/dd/yyyy"));
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
+                        continue;                        
                     }if (column == "EndDate")
                     {
-                        arg.Add(column, Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy"));
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateDate(Console.ReadLine());
+
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1.Date.ToString("MM/dd/yyyy"));
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
                         continue;
-                    }if (column == "Price")
+                    }
+                    if (column == "Price")
                     {
-                        arg.Add(column, Validation.ValidatePrice(Console.ReadLine()));
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidatePrice(Console.ReadLine());
+
+                        if (valid.Item2 == true)
+                            {
+                                arg.Add(column, Math.Round(valid.Item1, 2));
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+                        }                        
                         continue;
+
                     }if (column == "Title")
                     {
                         arg.Add(column, Validation.ValidateTitle(Console.ReadLine()));
                         continue;
                     }if (column == "PhotoURL")
                     {
-                        arg.Add(column, Validation.ValidateURL(Console.ReadLine()));
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateURL(Console.ReadLine());
+                            if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+
+                        }
                         continue;
-                    }if (column == "TransactionNumber")
+                    }
+                    if (column == "TransactionNumber")
                     {
-                        arg.Add(column, Validation.ValidateTransactionNumber(Console.ReadLine()));
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var valid = Validation.ValidateTransactionNumber(Console.ReadLine());
+                        if (valid.Item2 == true)
+                            {
+                                arg.Add(column, valid.Item1);
+                                break;
+                            }
+
+                            if (i == 3)
+                            {
+                                throw new Exception("Validation - ");
+                            }
+                        }
                         continue;
                     }
                     else
@@ -243,23 +423,23 @@ namespace Lab2
                 if (key == "URL")
                 {
                     Console.WriteLine("New value");
-                    string value = Validation.ValidateURL(Console.ReadLine());
-                    arg.Add(key, value);
+                    var value = Validation.ValidateURL(Console.ReadLine());
+                    arg.Add(key, value.Item1);
                 }if(key == "StartDate")
                 {
                     Console.WriteLine("New value");
-                    var value = Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy");
-                    arg.Add(key, value);
+                    var value = Validation.ValidateDate(Console.ReadLine());
+                    arg.Add(key, value.Item1.Date.ToString("MM/dd/yyyy"));
                 }if(key == "EndDate")
                 {
                     Console.WriteLine("New value");
-                    var value = Validation.ValidateDate(Console.ReadLine()).Date.ToString("MM/dd/yyyy");
-                    arg.Add(key, value);
+                    var value = Validation.ValidateDate(Console.ReadLine());
+                    arg.Add(key, value.Item1.Date.ToString("MM/dd/yyyy"));
                 }if(key == "Price")
                 {
                     Console.WriteLine("New value");
                     var value = Validation.ValidatePrice(Console.ReadLine());
-                    arg.Add(key, value);
+                    arg.Add(key, Math.Round(value.Item1, 2));
                 }if (key == "Title")
                 {
                     Console.WriteLine("New value");
@@ -268,13 +448,13 @@ namespace Lab2
                 }if (key == "PhotoURL")
                 {
                     Console.WriteLine("New value");
-                    string value = Validation.ValidateURL(Console.ReadLine());
-                    arg.Add(key, value);
+                    var value = Validation.ValidateURL(Console.ReadLine());
+                    arg.Add(key, value.Item1);
                 }if (key == "TransactionNumber")
                 {
                     Console.WriteLine("New value");
-                    string value = Validation.ValidateTransactionNumber(Console.ReadLine());
-                    arg.Add(key, value);
+                    var value = Validation.ValidateTransactionNumber(Console.ReadLine());
+                    arg.Add(key, value.Item1);
                 }                
             }
             else
