@@ -1,4 +1,5 @@
-﻿using LB2.Model;
+﻿using Lab2.Enum;
+using LB2.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,21 +14,21 @@ namespace Lab2
         {
             var userCheck = Advertisement.ParceFileToModel<UserModel>(file);
 
-            var user = userCheck.FirstOrDefault(x => x.Email == login && x.Password == password);
+            var user = userCheck.FirstOrDefault(x => x.Email == login && x.Password == User.GetHashString(password));
 
             if (user != null)
             {
-                if (user.Role == "Admin")
+                if (user.Role == Role.Admin.ToString())
                 {
-                    Console.WriteLine("Welcome {0},{1}, U logged as {2}", user.FirstName, user.LastName, user.Role);
+                    Console.WriteLine("\r\n" + "Welcome {0}, {1}, U logged as {2}" + "\r\n", user.FirstName, user.LastName, user.Role);
                     Admin admin = new Admin();
                     admin.Role = user.Role;
                     Admin.WorksMenu();
                 }
                 else
-                if (user.Role == "Staff")
+                if (user.Role == Role.Staff.ToString())
                 {
-                    Console.WriteLine("Welcome {0}, {1}, U logged as {2}", user.FirstName, user.LastName, user.Role);
+                    Console.WriteLine("\r\n" + "Welcome {0}, {1}, U logged as {2}" + "\r\n", user.FirstName, user.LastName, user.Role);
                     Staff staff = new Staff();
                     staff.Role = user.Role;
                     staff.Salary = user.Salary.HasValue ? user.Salary.Value : null;

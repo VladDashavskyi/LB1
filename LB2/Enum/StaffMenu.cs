@@ -8,11 +8,11 @@ namespace Lab2.Enum
 {
     public enum StaffMenu
     {
-        Add=1,
+        Add = 1,
         Remove,
-        Update,
-        Filter,
+        Search,
         Sort,
+        Update,
         Exit
     }
 }

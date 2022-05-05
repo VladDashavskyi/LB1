@@ -79,7 +79,7 @@ namespace Lab2
                 }
                 if (column == "Password")
                 {
-                    arg.Add(column, Validation.ValidatePassword(Console.ReadLine()));
+                    arg.Add(column, User.GetHashString(Validation.ValidatePassword(Console.ReadLine())));
                     continue;
                 }
                 if (column == "Salary")

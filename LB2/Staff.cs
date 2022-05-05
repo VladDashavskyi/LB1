@@ -16,12 +16,15 @@ namespace Lab2
 
         private static void PrintMenu()
         {
+            Console.WriteLine("\r\n");
             Console.WriteLine("MENU");
+            Console.WriteLine("\r\n");
             foreach (StaffMenu menu in (StaffMenu[])System.Enum.GetValues(typeof(StaffMenu)))
             {
                 Console.WriteLine(String.Join(" - ", (int)menu, menu));
             }
 
+            Console.WriteLine("\r\n");
             Console.WriteLine("Make a choice" + "\r\n");
         }
 
@@ -31,11 +34,15 @@ namespace Lab2
             var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
             var inputFile = Advertisement.GetListDictionaryFromFile(file, false, isValidate);
-            Handler<Menu> handler = new Handler<Menu>(file, isValidate);
+            Handler<Menu> handler = new Handler<Menu>(file, statusFile, isValidate);
             Dictionary<string, object> arg = new Dictionary<string, object>();
             int rowId = 0;
+            string key = string.Empty;
+            string value = string.Empty;
+
+            Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, email));
             PrintMenu();
-            Advertisement.WriteConsoleDictionary(ReadStatusModel(statusFile, file, email));
+            
             string action = string.Empty;
             try
             {
@@ -49,26 +56,49 @@ namespace Lab2
                         switch (menuId)
                         {
                             case (int)StaffMenu.Add:
-                                Add(inputFile, arg, isValidate);
+                                rowId = Add(inputFile, arg, isValidate);
                                 break;
-
                             case (int)StaffMenu.Remove:
+                                Console.WriteLine("Enter ID");
+                                int.TryParse(Console.ReadLine(), out rowId);
                                 break;
                             case (int)StaffMenu.Update:
+                                rowId = Update(inputFile, arg, isValidate);
                                 break;
-                            case (int)StaffMenu.Filter:
+                            case (int)StaffMenu.Search:
+                                var columns = Advertisement.PrintFileColumnModel(Advertisement.ReadStatusModel(statusFile, file, email), true);
+                                Console.WriteLine("Choose column");
+                                key = Console.ReadLine();
+                                Console.WriteLine("Enter value");
+                                value = Console.ReadLine();
+                                arg.Add("Email", email);
+                                arg.Add(key, value);
                                 break;
                             case (int)StaffMenu.Sort:
+                                columns = Advertisement.PrintFileColumnModel(Advertisement.ReadStatusModel(statusFile, file, email), true);
+                                Console.WriteLine("Choose column");
+                                key = Console.ReadLine();
+                                Console.WriteLine("Choose order");
+                                value = Console.ReadLine();
+                                arg.Add(key, value);
                                 break;
                         }
                     }
 
                     Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
                     handler.HandlerRun(menu, rowId, arg);
-                    WriteStatusFile(statusFile, 18, email, action, message);
+
+                    if (menuId == (int)StaffMenu.Add || menuId == (int)StaffMenu.Update || menuId == (int)StaffMenu.Remove)
+                    {
+                        WriteStatusFile(statusFile, rowId, email, ((StaffMenu)menuId).ToString(), String.Empty);
+                    }
+
                     arg = new Dictionary<string, object>();
                     rowId = 0;
-                    Advertisement.WriteConsoleDictionary(ReadStatusModel(statusFile, file, email));
+                    key = String.Empty;
+                    value = String.Empty;
+                    if(menuId != (int)StaffMenu.Search)
+                    Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, email));
                     PrintMenu();
                 }
             }
@@ -78,64 +108,21 @@ namespace Lab2
             }
         }
 
-        private static List<Dictionary<string, object>> ReadStatusModel(string statusFile, string file, string email)
-        {
-
-            
-            var statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile).Where(w => w.Email == email);
-            var inputModel = Advertisement.GetListDictionaryFromFile(file, false);
-
-            List<Dictionary<string, object>> outputModel = new List<Dictionary<string, object>>();
-
-            foreach (var item in statusModel)
-            {
-                foreach (var itemOut in inputModel)
-                {
-                    foreach (KeyValuePair<string, object> kvp in itemOut.Where(w => w.Key == "ID").ToList())
-                    {
-                        if (kvp.Value.ToString() == item.ID.ToString())
-                        {
-                            itemOut.Add("Status", item.Status);
-                            itemOut.Add("Message", item.Message);
-                            outputModel.Add(itemOut);
-
-                        }
-                    }
-                }
-            }
-
-            return outputModel;
-        }
-        private static void Add(List<Dictionary<string, object>> inputFile, Dictionary<string, object> arg, bool isValidate = true)
+        private static int Add(List<Dictionary<string, object>> inputFile, Dictionary<string, object> arg, bool isValidate = true)
         {
             var columns = Advertisement.PrintFileColumnModel(inputFile, false, false);
-            arg.Add("ID", inputFile.Max(w => w.TryGetValue("ID", out object id)));
+            object id = null;
+            inputFile.Max(w => w.TryGetValue("ID", out id));
+            int newId = int.Parse(id.ToString()) + 1;
+
+            arg.Add("ID", newId);
+
             foreach (var column in columns)
             {
                 Console.WriteLine("Add value for column " + column);
 
                 if (isValidate)
                 {                   
-                    //if (column == "ID")
-                    //{
-                    //    for (int i = 0; i < 4; i++)
-                    //    {
-                    //        var valid = Validation.ValidateId(Console.ReadLine());
-                    //        if (valid.Item2 == true)
-                    //        {
-                    //            arg.Add(column, valid.Item1);
-                    //            break;
-                    //        }
-
-                    //        if (i == 3)
-                    //        {
-                    //            throw new Exception("Validation - ");
-                    //        }
-
-                    //    }
-                    //    continue;
-
-                    //}
                     if (column == "URL")
                     {
 
@@ -272,6 +259,7 @@ namespace Lab2
                 }
             }
 
+            return newId; 
         }
 
         private static int Update(List<Dictionary<string, object>> inputFile, Dictionary<string, object> arg, bool isValidate = true)
@@ -340,16 +328,27 @@ namespace Lab2
         {
             var statusFileModel = Advertisement.ParceFileToModel<StatusModel>(statusFile);
 
-            StatusModel statusModel = new StatusModel 
-            { 
-                ID = id,
-                Email = email, 
-                Action = action, 
-                Message = message, 
-                Status = Status.Draft.ToString() 
-            };
+            var result = statusFileModel.FirstOrDefault(w => w.ID == id);
 
-            statusFileModel.Add(statusModel);
+            if (result == null)
+            {
+                StatusModel statusModel = new StatusModel
+                {
+                    ID = id,
+                    Email = email,
+                    Action = action,
+                    Message = message,
+                    Status = Status.Draft.ToString()
+                };
+
+                statusFileModel.Add(statusModel);
+            }
+            else
+            {
+                result.Action = action;
+                result.Message = message;
+                result.Status = Status.Draft.ToString();
+            }
 
             Advertisement.WriteToJsonFile(statusFileModel, statusFile);
         }

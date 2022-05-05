@@ -168,7 +168,7 @@ namespace Lab2
                     }
                 }
 
-                WriteConsoleDictionary(filterModel);
+                WriteConsoleDictionary(filterModel, true);
             }
             catch (Exception e)
             {
@@ -200,7 +200,7 @@ namespace Lab2
             return columnNames;
         }
          
-        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = true, bool isValidate = true)
+        public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = false, bool isValidate = true)
         {
             try
             {
@@ -255,9 +255,16 @@ namespace Lab2
             return val2;
         }
 
-        public static void WriteConsoleDictionary(List<Dictionary<string, object>> inputModel)
+        public static void WriteConsoleDictionary(List<Dictionary<string, object>> inputModel, bool isSearch = false)
         {
-            Console.WriteLine($"Import file - count of rows: {inputModel.Count}");
+            if (!isSearch)
+            {
+                Console.WriteLine($"Import file - count of rows: {inputModel.Count}");
+            }
+            else
+            {
+                Console.WriteLine($"Found rows count: {inputModel.Count}");
+            }
             string s = String.Empty;
             foreach (var item in inputModel.Take(1))
             {
@@ -275,6 +282,43 @@ namespace Lab2
                 }
                 Console.Write("\t\n");
             }
+        }
+
+        public static List<Dictionary<string, object>> ReadStatusModel(string statusFile, string file, string email, bool isAdmin = false)
+        {
+            IEnumerable<StatusModel> statusModel;
+
+            if (!isAdmin)
+            {
+                statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile).Where(w => w.Email == email);
+            }  
+            else
+            {
+                statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile);
+            }
+
+            var inputModel = Advertisement.GetListDictionaryFromFile(file, false);
+
+            List<Dictionary<string, object>> outputModel = new List<Dictionary<string, object>>();
+
+            foreach (var itemOut in inputModel)
+            {
+                foreach (KeyValuePair<string, object> kvp in itemOut.Where(w => w.Key == "ID").ToList())
+                {
+                    foreach (var item in statusModel)
+                    {
+                        if (kvp.Value.ToString() == item.ID.ToString())
+                        {
+                            itemOut.Add("Status", item.Status);
+                            itemOut.Add("Message", item.Message);
+                            outputModel.Add(itemOut);
+
+                        }
+                    }
+                }
+            }
+
+            return outputModel;
         }
     }
 }

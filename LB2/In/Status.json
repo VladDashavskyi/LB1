@@ -20,12 +20,6 @@
   },
   {
     "ID": "4",
-    "Email": "staf2@gmail.com",
-    "Status": "Draft",
-    "Action": "Add"
-  },
-  {
-    "ID": "5",
     "Email": "staf1@gmail.com",
     "Status": "Rejected",
     "Action": "Add",

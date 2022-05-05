@@ -8,10 +8,9 @@ namespace Lab2.Enum
 {
     public enum AdminMenu
     {
-        Update=1,
-        //AddUser,
-        //UpdateUser,
-        //DeleteUser,
+        Approve = 1,
+        Reject,
+        Search,
         Exit
     }
 }

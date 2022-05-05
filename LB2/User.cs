@@ -14,12 +14,12 @@ namespace Lab2
         private string role;
         private string password;
 
-        public static string GetStringSha256Hash(string text)
+        public static string GetHashString(string text)
         {
             if (String.IsNullOrEmpty(text))
                 return String.Empty;
 
-            using (var sha = new System.Security.Cryptography.SHA256Managed())
+            using (var sha = new System.Security.Cryptography.SHA1Managed())
             {
                 byte[] textData = System.Text.Encoding.UTF8.GetBytes(text);
                 byte[] hash = sha.ComputeHash(textData);
@@ -74,7 +74,7 @@ namespace Lab2
             get { return password; }
             set
             {             
-                    password =Validation.ValidatePassword(GetStringSha256Hash(value));              
+                    password =Validation.ValidatePassword(GetHashString(value));              
             }
         }
     }

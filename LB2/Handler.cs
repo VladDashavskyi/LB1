@@ -11,12 +11,14 @@ namespace Lab2
     {
         private readonly Dictionary<Menu, Func<int, Dictionary<string, object>,Task>> _handlers;
         private readonly string _inputFile;
+        private readonly string _statusFile;
         private List<Dictionary<string, object>> dictionary;
 
-        public Handler(string inputFile, bool isValidate = true)
+        public Handler(string inputFile, string statusFile, bool isValidate = true)
         {
             _inputFile = inputFile;
-            dictionary = Advertisement.GetListDictionaryFromFile(_inputFile,false, isValidate);
+            _statusFile = statusFile;
+            dictionary = Advertisement.GetListDictionaryFromFile(_inputFile, false, isValidate);
             _handlers = new Dictionary<Menu, Func<int, Dictionary<string, object>, Task>>
             {
                 { Menu.Sort, HandleSortFile },
@@ -47,7 +49,20 @@ namespace Lab2
 
         private async Task HandleFilter(int rowid, Dictionary<string, object> arg)
         {
-            Advertisement.Filter(dictionary, arg.FirstOrDefault().Key, arg.FirstOrDefault().Value.ToString());
+            List<Dictionary<string, object>> statusModel = new List<Dictionary<string, object>>(rowid);
+
+            var role = arg.FirstOrDefault(w => w.Key.Contains("Role")).Value;
+
+            if (role == null)
+            {
+                statusModel = Advertisement.ReadStatusModel(_statusFile, _inputFile, arg.FirstOrDefault(w => w.Key.Contains("Email")).Value.ToString());
+                Advertisement.Filter(statusModel, arg.FirstOrDefault(w => !w.Key.Contains("Email")).Key, arg.FirstOrDefault(w => !w.Key.Contains("Email")).Value.ToString());
+            }
+            else
+            {
+                statusModel = Advertisement.ReadStatusModel(_statusFile, _inputFile, string.Empty, true);
+                Advertisement.Filter(statusModel, arg.FirstOrDefault(w => !w.Key.Contains("Role")).Key, arg.FirstOrDefault(w => !w.Key.Contains("Role")).Value.ToString());
+            }                        
         }
 
         private async Task HandleRemoveRow(int rowId, Dictionary<string, object> arg)
