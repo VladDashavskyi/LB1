@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lab2.Enum;
+using LB2.Model;
 
 namespace Lab2
 {
     public class Handler<T>
     {
-        private readonly Dictionary<Menu, Func<int, Dictionary<string, object>,Task>> _handlers;
+        private readonly Dictionary<Menu, Func<int, Dictionary<string, object>, Task>> _handlers;
         private readonly string _inputFile;
         private readonly string _statusFile;
         private List<Dictionary<string, object>> dictionary;
@@ -26,6 +27,7 @@ namespace Lab2
                 { Menu.Remove, HandleRemoveRow },
                 { Menu.Update, HandleUpdate },
                 { Menu.Add, HandleAddRow },
+                { Menu.Approve, HandleApprove },
             };
         }
 
@@ -62,7 +64,7 @@ namespace Lab2
             {
                 statusModel = Advertisement.ReadStatusModel(_statusFile, _inputFile, string.Empty, true);
                 Advertisement.Filter(statusModel, arg.FirstOrDefault(w => !w.Key.Contains("Role")).Key, arg.FirstOrDefault(w => !w.Key.Contains("Role")).Value.ToString());
-            }                        
+            }
         }
 
         private async Task HandleRemoveRow(int rowId, Dictionary<string, object> arg)
@@ -83,13 +85,17 @@ namespace Lab2
             Advertisement.AddRow(_inputFile, dictionary);
             dictionary = Advertisement.GetListDictionaryFromFile(_inputFile, false);
         }
-
-        private Dictionary<string, object> AddRow(string key, object value)
+        private async Task HandleApprove(int rowId, Dictionary<string, object> arg)
         {
-            Dictionary<string, object> newRow = new Dictionary<string, object>();
-            newRow.Add(key, value);
+            var statusFileModel = Advertisement.ParceFileToModel<StatusModel>(_statusFile);
 
-            return newRow;
+            var result = statusFileModel.FirstOrDefault(w => w.ID == rowId);
+
+            if (result != null && result.Action == Enum.Menu.Remove.ToString())
+            {
+                Advertisement.DeleteRow(_inputFile, dictionary, "ID", rowId > 0 ? rowId : -1);
+                dictionary = Advertisement.GetListDictionaryFromFile(_inputFile);
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Lab2.Enum
         Search,
         Sort,
         Update,
-        Exit
+        Exit,
+        LogOut
     }
 }

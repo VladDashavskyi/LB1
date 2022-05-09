@@ -20,7 +20,8 @@ namespace Lab2
         }
         public static (string,bool) ValidateURL(string url)
         {
-            if (url.Substring(0, 5) != ("https"))
+            Regex r = new Regex(@"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$");
+            if (!r.IsMatch(url.Trim()))
             {
                 Console.WriteLine("ValidationError: URL - is not valid");
                 return (url, false);

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lab2.Enum;
+using LB2.Model;
 
 namespace Lab2
 {
-    public class Admin :User
+    public class Admin : User
     {
         private static void PrintMenu()
         {
@@ -19,10 +20,11 @@ namespace Lab2
 
             Console.WriteLine("Make a choice" + "\r\n");
         }
-        
-        public static void WorksMenu()
+
+        public static int WorksMenu()
         {
             bool isValidate = true;
+            bool isSoftDelete = false;
             var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
             var inputFile = Advertisement.GetListDictionaryFromFile(file, false, isValidate);
@@ -31,6 +33,7 @@ namespace Lab2
             int rowId = 0;
             string key = string.Empty;
             string value = string.Empty;
+            string errorMessage = string.Empty;
 
             Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, String.Empty, true));
 
@@ -48,10 +51,14 @@ namespace Lab2
                         switch (menuId)
                         {
                             case (int)AdminMenu.Approve:
-                                Update();
+                                Console.WriteLine("Enter ID");
+                                int.TryParse(Console.ReadLine(), out rowId);
                                 break;
                             case (int)AdminMenu.Reject:
-
+                                Console.WriteLine("Enter ID");
+                                int.TryParse(Console.ReadLine(), out rowId);
+                                Console.WriteLine("Enter error message");
+                                errorMessage = Console.ReadLine();
                                 break;
                             case (int)AdminMenu.Search:
                                 var columns = Advertisement.PrintFileColumnModel(Advertisement.ReadStatusModel(statusFile, file, String.Empty, true), true);
@@ -62,14 +69,28 @@ namespace Lab2
                                 arg.Add("Role", Enum.Role.Admin);
                                 arg.Add(key, value);
                                 break;
+                                case(int)AdminMenu.LogOut:
+                                return (int)AdminMenu.LogOut;
+                                break;
                         }
 
-                        Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
-                        handler.HandlerRun(menu, rowId, arg);
+                        if (menuId == (int)AdminMenu.Search || (menuId == (int)AdminMenu.Approve && !isSoftDelete))
+                        {
+                            Menu menu = (Menu)System.Enum.Parse(typeof(Menu), ((AdminMenu)menuId).ToString());
+                            handler.HandlerRun(menu, rowId, arg);
+                        }
+
+                        if (menuId == (int)AdminMenu.Approve || menuId == (int)AdminMenu.Reject)
+                        {
+                            WriteStatusFile(statusFile, rowId, errorMessage);
+                        }
+
                         arg = new Dictionary<string, object>();
                         key = String.Empty;
                         value = String.Empty;
                         rowId = 0;
+                        if (menuId != (int)AdminMenu.Search)
+                            Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, string.Empty, true));
                         PrintMenu();
                     }
                 }
@@ -78,12 +99,19 @@ namespace Lab2
             {
                 Console.WriteLine(ex.Message);
             }
+            return 0;
         }
 
-        public static void Update()
+        private static void WriteStatusFile(string statusFile, int id, string message)
         {
+            var statusFileModel = Advertisement.ParceFileToModel<StatusModel>(statusFile);
 
+            var result = statusFileModel.FirstOrDefault(w => w.ID == id);
+
+            result.Message = message;
+            result.Status = string.IsNullOrEmpty(message) ? Status.Approved.ToString() : Status.Rejected.ToString();
+
+            Advertisement.WriteToJsonFile(statusFileModel, statusFile);
         }
-
     }
 }

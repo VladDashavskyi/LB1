@@ -28,9 +28,11 @@ namespace Lab2
             Console.WriteLine("Make a choice" + "\r\n");
         }
 
-        public static void WorksMenu(string email)
+        public static int WorksMenu(string email)
         {
             bool isValidate = true;
+            bool isSoftDelete = true;
+
             var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Input.json");
             var statusFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"in\Status.json");
             var inputFile = Advertisement.GetListDictionaryFromFile(file, false, isValidate);
@@ -42,7 +44,7 @@ namespace Lab2
 
             Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, email));
             PrintMenu();
-            
+
             string action = string.Empty;
             try
             {
@@ -82,11 +84,22 @@ namespace Lab2
                                 value = Console.ReadLine();
                                 arg.Add(key, value);
                                 break;
+                            case (int)StaffMenu.LogOut:
+                                return (int)StaffMenu.LogOut;
+                                break;
+
                         }
                     }
 
-                    Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
-                    handler.HandlerRun(menu, rowId, arg);
+                    if (isSoftDelete && menuId == (int)StaffMenu.Remove)
+                    {
+
+                    }
+                    else
+                    {
+                        Menu menu = (Menu)System.Enum.Parse(typeof(Menu), action);
+                        handler.HandlerRun(menu, rowId, arg);
+                    }
 
                     if (menuId == (int)StaffMenu.Add || menuId == (int)StaffMenu.Update || menuId == (int)StaffMenu.Remove)
                     {
@@ -97,8 +110,8 @@ namespace Lab2
                     rowId = 0;
                     key = String.Empty;
                     value = String.Empty;
-                    if(menuId != (int)StaffMenu.Search)
-                    Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, email));
+                    if (menuId != (int)StaffMenu.Search)
+                        Advertisement.WriteConsoleDictionary(Advertisement.ReadStatusModel(statusFile, file, email));
                     PrintMenu();
                 }
             }
@@ -106,6 +119,7 @@ namespace Lab2
             {
                 Console.WriteLine(ex.Message);
             }
+            return 0;
         }
 
         private static int Add(List<Dictionary<string, object>> inputFile, Dictionary<string, object> arg, bool isValidate = true)
@@ -122,7 +136,7 @@ namespace Lab2
                 Console.WriteLine("Add value for column " + column);
 
                 if (isValidate)
-                {                   
+                {
                     if (column == "URL")
                     {
 
@@ -137,7 +151,7 @@ namespace Lab2
 
                             if (i == 3)
                             {
-                                throw new Exception("Validation - ");
+                                throw new Exception("Value is not correct ");
                             }
 
                         }
@@ -157,7 +171,7 @@ namespace Lab2
 
                             if (i == 3)
                             {
-                                throw new Exception("Validation - ");
+                                throw new Exception("Value is not correct");
                             }
 
                         }
@@ -177,7 +191,7 @@ namespace Lab2
 
                             if (i == 3)
                             {
-                                throw new Exception("Validation - ");
+                                throw new Exception("Value is not correct ");
                             }
 
                         }
@@ -198,7 +212,7 @@ namespace Lab2
 
                             if (i == 3)
                             {
-                                throw new Exception("Validation - ");
+                                throw new Exception("Value is not correct ");
                             }
                         }
                         continue;
@@ -222,7 +236,7 @@ namespace Lab2
 
                             if (i == 3)
                             {
-                                throw new Exception("Validation - ");
+                                throw new Exception("Value is not correct  ");
                             }
 
                         }
@@ -241,7 +255,7 @@ namespace Lab2
 
                             if (i == 3)
                             {
-                                throw new Exception("Validation - ");
+                                throw new Exception("Value is not correct ");
                             }
                         }
                         continue;
@@ -259,14 +273,15 @@ namespace Lab2
                 }
             }
 
-            return newId; 
+            return newId;
         }
 
         private static int Update(List<Dictionary<string, object>> inputFile, Dictionary<string, object> arg, bool isValidate = true)
         {
-            var columns = Advertisement.PrintFileColumnModel(inputFile, true, false);
             Console.WriteLine("Choose ID");
             int.TryParse(Console.ReadLine(), out int rowId);
+
+            var columns = Advertisement.PrintFileColumnModel(inputFile, true, false);
 
             Console.WriteLine("Choose column");
             string key = Console.ReadLine();

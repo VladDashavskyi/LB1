@@ -10,7 +10,7 @@ namespace Lab2
 {
     public class Register
     {
-        public static void CheckUser(string file, string login, string password)
+        public static int CheckUser(string file, string login, string password)
         {
             var userCheck = Advertisement.ParceFileToModel<UserModel>(file);
 
@@ -23,7 +23,7 @@ namespace Lab2
                     Console.WriteLine("\r\n" + "Welcome {0}, {1}, U logged as {2}" + "\r\n", user.FirstName, user.LastName, user.Role);
                     Admin admin = new Admin();
                     admin.Role = user.Role;
-                    Admin.WorksMenu();
+                    return Admin.WorksMenu();
                 }
                 else
                 if (user.Role == Role.Staff.ToString())
@@ -34,17 +34,18 @@ namespace Lab2
                     staff.Salary = user.Salary.HasValue ? user.Salary.Value : null;
                     staff.FirstDayInCompany = user.FirstDateInCompany.HasValue ? user.FirstDateInCompany.Value : null;
                     staff.Email = user.Email;
-                    Staff.WorksMenu(staff.Email);
+                    return Staff.WorksMenu(staff.Email);
                 }
                 else
                 {
-                    Console.WriteLine("User ");
+                    Console.WriteLine("Role not found!");
                 }
             }
             else
             {
-                Console.WriteLine("dfgdfgdfgdfg");
+                Console.WriteLine("User not found");
             }
+            return 0;
         }
 
 

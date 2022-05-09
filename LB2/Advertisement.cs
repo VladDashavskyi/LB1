@@ -44,14 +44,14 @@ namespace Lab2
 
         public static IQueryable<JToken> ParceFileToModel(string file)
         {
-            IQueryable<JToken> data ;
+            IQueryable<JToken> data;
             using (StreamReader r = new StreamReader(file))
             {
                 string stringJson = r.ReadToEnd();
                 var json = JsonConvert.DeserializeObject<dynamic>(stringJson);
                 data = ((JToken)json).Children().AsQueryable();
             }
-            
+
             return data;
         }
 
@@ -137,10 +137,12 @@ namespace Lab2
             {
                 List<Dictionary<string, object>> sortModel = new List<Dictionary<string, object>>();
                 if (order == 0)
-                    sortModel = inputModel.OrderBy(x => x.ContainsKey(key) ? x[key] : string.Empty).ToList();
+                    sortModel = inputModel.OrderBy(x => x.ContainsKey(key)
+ ? x[key] : string.Empty).ToList();
 
                 if (order == 1)
-                    sortModel = inputModel.OrderByDescending(x => x.ContainsKey(key) ? x[key] : string.Empty).ToList();
+                    sortModel = inputModel.OrderByDescending(x => x.ContainsKey(key)
+ ? x[key] : string.Empty).ToList();
 
                 if (sortModel.Count > 0)
                     WriteToJsonFile(sortModel, file);
@@ -199,7 +201,7 @@ namespace Lab2
 
             return columnNames;
         }
-         
+
         public static List<Dictionary<string, object>> GetListDictionaryFromFile(string file, bool printFileToConsole = false, bool isValidate = true)
         {
             try
@@ -226,7 +228,7 @@ namespace Lab2
                 }
 
                 if (printFileToConsole)
-                WriteConsoleDictionary(model);
+                    WriteConsoleDictionary(model);
 
                 return model;
             }
@@ -284,14 +286,14 @@ namespace Lab2
             }
         }
 
-        public static List<Dictionary<string, object>> ReadStatusModel(string statusFile, string file, string email, bool isAdmin = false)
+        public static List<Dictionary<string, object>> ReadStatusModel(string statusFile, string file, string email, bool isAdmin = false, bool isDelete = true)
         {
             IEnumerable<StatusModel> statusModel;
 
             if (!isAdmin)
             {
-                statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile).Where(w => w.Email == email);
-            }  
+                statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile).Where(w => w.Email == email && !(w.Action == Enum.StaffMenu.Remove.ToString() && w.Status == Enum.Status.Draft.ToString()));
+            }
             else
             {
                 statusModel = Advertisement.ParceFileToModel<StatusModel>(statusFile);
@@ -309,10 +311,16 @@ namespace Lab2
                     {
                         if (kvp.Value.ToString() == item.ID.ToString())
                         {
+                            if (isAdmin)
+                            {
+                                itemOut.Add("User", item.Email);
+                                itemOut.Add("Action", item.Action);
+                            }
+
                             itemOut.Add("Status", item.Status);
                             itemOut.Add("Message", item.Message);
-                            outputModel.Add(itemOut);
 
+                            outputModel.Add(itemOut);
                         }
                     }
                 }

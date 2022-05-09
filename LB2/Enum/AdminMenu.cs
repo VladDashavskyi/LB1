@@ -11,6 +11,7 @@ namespace Lab2.Enum
         Approve = 1,
         Reject,
         Search,
-        Exit
+        Exit,
+        LogOut = 7
     }
 }

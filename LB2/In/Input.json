@@ -16,7 +16,7 @@
     "EndDate": "12/12/2024",
     "Price": 250.26,
     "Title": "Title2",
-    "PhotoURL": "https://www.url2.com/photo",
+    "PhotoURL": "http://www.url1.com/photo",
     "TransactionNumber": "BB-111-AA/11"
   },
   {
@@ -26,7 +26,7 @@
     "EndDate": "12/12/2024",
     "Price": 450.26,
     "Title": "Title3",
-    "PhotoURL": "https://www.url1.com/photo",
+    "PhotoURL": "http://www.url3.com/photo",
     "TransactionNumber": "CC-111-AA/11"
   }
 ]

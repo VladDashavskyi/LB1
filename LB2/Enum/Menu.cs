@@ -7,6 +7,8 @@
         Search,
         Sort,
         Update,
+        Approve,
+        Reject,
         Exit
     }
 }

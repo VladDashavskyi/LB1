@@ -20,8 +20,17 @@ namespace Lab2
                 string em = Validation.ValidateEmail(Console.ReadLine());
                 Console.WriteLine("Enter password");
                 string pass = Console.ReadLine();
-                Register.CheckUser(userFile, em, pass);
+                var r = Register.CheckUser(userFile, em, pass);
+                while (r == 7)                  
+                {
+                    Console.WriteLine("Enter email");
+                    em = Validation.ValidateEmail(Console.ReadLine());
+                    Console.WriteLine("Enter password");
+                    pass = Console.ReadLine();
+                    r = Register.CheckUser(userFile, em, pass);
+                }
             }
+
             else
             {
                 var inputFile = Advertisement.GetListDictionaryFromFile(userFile, false);
