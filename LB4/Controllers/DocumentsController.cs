@@ -55,7 +55,7 @@ namespace LB4.Controllers
         [Route("/Documents/Document")]
         [SwaggerResponse(200, type: typeof(Documents), description: "Item by filter")]
 
-        public async Task<List<Documents>> GetDocumentAsync(int documentId, string url = null, string startDate = null, string endDate = null, string title = null, string photoUrl = null, string price = null, string transactionNumber = null)
+        public async Task<List<Documents>> GetDocumentAsync([FromQuery] int? documentId = null, [FromQuery] string url = null, [FromQuery] string startDate = null, [FromQuery] string endDate = null, [FromQuery] string title = null, [FromQuery] string photoUrl = null, [FromQuery] string price = null, [FromQuery] string transactionNumber = null)
         {
             var result = await _documentsService.GetDocumentAsync(documentId, url, startDate,  endDate,  title, photoUrl,  price,  transactionNumber);
 

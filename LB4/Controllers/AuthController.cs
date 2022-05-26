@@ -44,6 +44,8 @@ namespace LB4.Controllers
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
+            user = new User();
+
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.DateOfBirth = request.DateOfBirth;

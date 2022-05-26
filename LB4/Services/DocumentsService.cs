@@ -31,11 +31,11 @@ namespace LB4.Services
             return result;
         }
 
-        public async Task<List<Documents>> GetDocumentAsync(int documentId, string url, string startDate, string endDate, string title, string photoUrl, string price, string transactionNumber )
+        public async Task<List<Documents>> GetDocumentAsync(int? documentId, string url, string startDate, string endDate, string title, string photoUrl, string price, string transactionNumber )
         {
             IQueryable<Documents> query = _unitOfTenant.Documents.AsNoTracking();
 
-            if (documentId > 0)
+            if (documentId != null && documentId > 0)
                 query = query.Where(x => x.DocumentId == documentId);
 
             if (!string.IsNullOrEmpty(url))
