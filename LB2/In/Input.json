@@ -1,0 +1,32 @@
+[
+  {
+    "ID": 1,
+    "URL": "https://www.url1.com",
+    "StartDate": "10/02/2022",
+    "EndDate": "12/12/2024",
+    "Price": 150.00,
+    "Title": "Title1",
+    "PhotoURL": "https://www.url1.com/photo",
+    "TransactionNumber": "AA-111-AA/11"
+  },
+  {
+    "ID": 2,
+    "URL": "https://www.url2.com",
+    "StartDate": "12/02/2022",
+    "EndDate": "12/12/2024",
+    "Price": 250.26,
+    "Title": "Title2",
+    "PhotoURL": "http://www.url1.com/photo",
+    "TransactionNumber": "BB-111-AA/11"
+  },
+  {
+    "ID": 3,
+    "URL": "https://www.url3.com",
+    "StartDate": "10/02/2022",
+    "EndDate": "12/12/2024",
+    "Price": 450.26,
+    "Title": "Title3",
+    "PhotoURL": "http://www.url3.com/photo",
+    "TransactionNumber": "CC-111-AA/11"
+  }
+]
